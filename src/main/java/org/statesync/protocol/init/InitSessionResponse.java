@@ -15,10 +15,20 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class InitSessionResponse extends EventMessage {
-	public String sessionId;
+	/**
+	 * Session token used by protocol, external sessionId can't be used because
+	 * of security concerns
+	 */
+	public final String sessionToken;
 
-	public InitSessionResponse(final String sessionId) {
+	/**
+	 * User token
+	 */
+	public final String userToken;
+
+	public InitSessionResponse(final String sessionToken, final String userToken) {
 		super(EventType.init);
-		this.sessionId = sessionId;
+		this.sessionToken = sessionToken;
+		this.userToken = userToken;
 	}
 }

@@ -8,13 +8,18 @@ import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 
 public class SyncSession {
 	public final String userId;
-	public final String sessionId;
+	public final String sessionToken;
 	public SyncService service;
+	public String userToken;
+	public String externalSessionId;
 
-	public SyncSession(final SyncService service, final String userId, final String sessionId) {
+	public SyncSession(final SyncService service, final String userId, final String sessionToken,
+			final String userToken, final String externalSessionId) {
 		this.service = service;
 		this.userId = userId;
-		this.sessionId = sessionId;
+		this.sessionToken = sessionToken;
+		this.userToken = userToken;
+		this.externalSessionId = externalSessionId;
 	}
 
 	public void handle(final RequestMessage event) {
@@ -33,7 +38,7 @@ public class SyncSession {
 	}
 
 	public InitSessionResponse init() {
-		return new InitSessionResponse(this.sessionId);
+		return new InitSessionResponse(this.sessionToken, this.userToken);
 	}
 
 	private void patchArea(final PatchAreaRequest event) {

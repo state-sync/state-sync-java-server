@@ -22,23 +22,26 @@ import org.statesync.protocol.sync.PatchAreaEvent;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import lombok.Getter;
 import lombok.extern.java.Log;
 
-@Getter
 @Log
-public abstract class SyncArea<Model> {
+public class SyncArea<Model> {
 	private final Map<String, SyncAreaUser> users = new ConcurrentHashMap<>();
 	private final Map<String, SyncSession> sessions = new ConcurrentHashMap<>();
 	private SyncService service;
-	private final String id;
-	private final JsonSynchronizer<Model> synchronizer;
-	private SyncAreaConfig config;
+	private final String areaId;
+	protected final JsonSynchronizer<Model> synchronizer;
+	private SyncAreaConfig<Model> config;
+	private StateStorage<Model> storage;
+	private StateProcessor<Model> processor;
 
-	public SyncArea(final SyncAreaConfig config) {
-		this.id = config.getId();
+	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage<Model> storage,
+			final StateProcessor<Model> processor) {
 		this.config = config;
-		this.synchronizer = new JsonSynchronizer<>(config);
+		this.storage = storage;
+		this.processor = processor;
+		this.areaId = config.getId();
+		this.synchronizer = new JsonSynchronizer<>(config.getModel());
 	}
 
 	protected boolean checkPermissions(final String userId) {
@@ -56,7 +59,13 @@ public abstract class SyncArea<Model> {
 		return json;
 	}
 
-	protected abstract ClientAreaConfig getConfig(SyncAreaUser user);
+	public final String getAreaId() {
+		return this.areaId;
+	}
+
+	protected ClientAreaConfig getClientConfig(final SyncAreaUser user) {
+		return this.config.getClientConfig();
+	}
 
 	public int getSessionsCount() {
 		return this.sessions.size();
@@ -65,8 +74,6 @@ public abstract class SyncArea<Model> {
 	public int getUsersCount() {
 		return this.users.size();
 	}
-
-	protected abstract Model loadModel(SyncAreaUser session);
 
 	protected void onRegister(final SyncService service) {
 		this.service = service;
@@ -80,69 +87,75 @@ public abstract class SyncArea<Model> {
 		}
 		try {
 			// patch model
-			final Model original = loadModel(user);
+			final Model original = this.storage.load(user);
 			Model updated = this.synchronizer.patch(original, request.patch);
-			updated = process(updated, user);
-			storeModel(updated, user);
+			updated = this.processor.process(updated, user);
+			this.storage.save(updated, user);
 			ArrayNode patch = this.synchronizer.diff(original, updated);
 			patch = filterOutputModel(patch);
-
-			final EventMessage event = new PatchAreaEvent(this.id, patch);
-			// broadcast to all user sessions
-			this.service.protocol.broadcast(session.userId, event);
+			if (patch.size() > 0) {
+				final EventMessage event = new PatchAreaEvent(this.areaId, patch);
+				// broadcast to all user sessions
+				this.service.protocol.broadcast(session.userToken, event);
+			}
 			// send confirmation to original session
-			this.service.protocol.send(session.sessionId, new PatchAreaResponse(request.id, getId()));
+			this.service.protocol.send(session.sessionToken, new PatchAreaResponse(request.id, this.areaId));
 		} catch (final Exception e) {
 			log.log(Level.SEVERE, "patch error", e);
-			this.service.protocol.send(session.sessionId, new PatchAreaFail(request.id, getId(), PatchError.unknown));
+			this.service.protocol.send(session.sessionToken,
+					new PatchAreaFail(request.id, this.areaId, PatchError.unknown));
 		}
-
 	}
-
-	protected abstract Model process(Model model, SyncAreaUser user);
-
-	protected abstract void storeModel(Model model, SyncAreaUser user);
 
 	public void subscribeSession(final SyncSession session, final SubscribeAreaRequest event) {
 
-		final String sessionId = session.sessionId;
+		final String sessionToken = session.sessionToken;
 
 		// security
 		if (!checkPermissions(session.userId)) {
-			this.service.protocol.send(sessionId,
-					new SubscribeAreaFail(event.id, getId(), AreaSubscriptionError.accessDenied));
+			this.service.protocol.send(sessionToken,
+					new SubscribeAreaFail(event.id, this.areaId, AreaSubscriptionError.accessDenied));
 			return;
 		}
 
 		// link
-		final SyncAreaUser user = this.users.computeIfAbsent(session.userId, id -> new SyncAreaUser(session.userId));
-		this.sessions.put(sessionId, session);
-		user.sessions.put(sessionId, session);
+		final SyncAreaUser user = this.users.computeIfAbsent(session.userId,
+				id -> new SyncAreaUser(session.userId, this.service.newUserToken(session.userId)));
+		this.sessions.put(sessionToken, session);
+		user.sessions.put(sessionToken, session);
 
 		// sync model
-		Model model = loadModel(user);
-		model = process(model, user);
+		Model model = this.storage.load(user);
+		model = this.processor.process(model, user);
 		// TODO: notify other user sessions about changes
-		storeModel(model, user);
+		this.storage.save(model, user);
 		final ObjectNode json = filterOutputModel(this.synchronizer.json(model));
 
 		// response
-		final ClientAreaConfig clientConfig = getConfig(user);
-		final SubscribeAreaResponse response = new SubscribeAreaResponse(event.id, getId(), clientConfig, json);
-		this.service.protocol.send(sessionId, response);
+		final ClientAreaConfig clientConfig = getClientConfig(user);
+		final SubscribeAreaResponse response = new SubscribeAreaResponse(event.id, this.areaId, clientConfig, json);
+		this.service.protocol.send(sessionToken, response);
+	}
+
+	public void sync(final SyncAreaUser user, final Synchronizer<Model> synchronizer) {
+		final Model original = this.storage.load(user);
+		final Model updated = this.processor.process(original, user);
+		ArrayNode patch = this.synchronizer.diff(original, updated);
+		if (patch.size() > 0) {
+			this.storage.save(updated, user);
+		}
+		patch = filterOutputModel(patch);
+		if (patch.size() > 0) {
+			final EventMessage event = new PatchAreaEvent(this.areaId, patch);
+			// broadcast to all user sessions
+			this.service.protocol.broadcast(user.userToken, event);
+		}
 	}
 
 	public void sync(final Synchronizer<Model> synchronizer) {
-		// this.sessions.forEach(action);
-		// final Model original = loadModel(session);
-		// final Model updated = process(original, session);
-		// storeModel(updated, session);
-		//
-		// final JsonNode serverPatch = this.synchronizer.diff(original,
-		// updated);
-		// this.service.protocol.send(sessionId, event);
-		// ServerPatch(this.principal, serverPatch);
-		// storeModel(original, session);
+		this.users.forEach((k, user) -> {
+			sync(user, synchronizer);
+		});
 	}
 
 	public void unregister() {
@@ -152,11 +165,11 @@ public abstract class SyncArea<Model> {
 	public void unsubscribeSession(final SyncSession session, final UnsubscribeAreaRequest event) {
 
 		// unlink
-		this.sessions.remove(session.sessionId);
+		this.sessions.remove(session.sessionToken);
 		this.users.computeIfPresent(session.userId, (id, user) -> user.remove(session) ? null : user);
 
 		// response
-		final UnsubscribeAreaResponse response = new UnsubscribeAreaResponse(event.id, getId());
-		this.service.protocol.send(session.sessionId, response);
+		final UnsubscribeAreaResponse response = new UnsubscribeAreaResponse(event.id, this.areaId);
+		this.service.protocol.send(session.sessionToken, response);
 	}
 }

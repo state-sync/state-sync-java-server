@@ -12,15 +12,15 @@ public interface SyncOutbound {
 	 * @param event
 	 *            - event to send
 	 */
-	void broadcast(final String userId, final EventMessage event);
+	void broadcast(final String userToken, final EventMessage event);
 
 	/**
 	 * Send event to particular session
 	 *
-	 * @param sessionId
-	 *            - sessionId
+	 * @param sessionToken
+	 *            - sessionToken
 	 * @param event
 	 *            - event to send
 	 */
-	void send(final String sessionId, final ResponseMessage event);
+	void send(final String sessionToken, final ResponseMessage event);
 }

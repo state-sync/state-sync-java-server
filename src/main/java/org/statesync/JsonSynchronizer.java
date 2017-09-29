@@ -2,8 +2,6 @@ package org.statesync;
 
 import java.io.IOException;
 
-import org.statesync.config.SyncAreaConfig;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,9 +16,8 @@ public class JsonSynchronizer<T> {
 	private ObjectMapper mapper;
 	private Class<T> clazz;
 
-	@SuppressWarnings("unchecked")
-	public JsonSynchronizer(final SyncAreaConfig config) {
-		this.clazz = (Class<T>) config.getModel();
+	public JsonSynchronizer(final Class<T> clazz) {
+		this.clazz = clazz;
 		this.mapper = new ObjectMapper();
 		// Redux and NgRx would like to have null value of property instead of
 		// absent property

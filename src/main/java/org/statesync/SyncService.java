@@ -19,9 +19,9 @@ public class SyncService {
 		this.protocol = protocol;
 	}
 
-	public InitSessionResponse connect(@NonNull final String userId) {
-		final SyncSession session = newSession(userId);
-		this.sessions.put(session.sessionId, session);
+	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId) {
+		final SyncSession session = newSession(userId, externalSessionId);
+		this.sessions.put(session.sessionToken, session);
 		return session.init();
 	}
 
@@ -51,20 +51,24 @@ public class SyncService {
 				.getSum();
 	}
 
-	public void handle(@NonNull final String sessionId, final RequestMessage event) {
-		this.sessions.get(sessionId).handle(event);
+	public void handle(@NonNull final String sessionToken, final RequestMessage event) {
+		this.sessions.get(sessionToken).handle(event);
 	}
 
-	protected SyncSession newSession(@NonNull final String userId) {
-		return new SyncSession(this, userId, newSessionId());
+	protected SyncSession newSession(@NonNull final String userId, final String externalSessionId) {
+		return new SyncSession(this, userId, newSessionToken(userId), newUserToken(userId), externalSessionId);
 	}
 
-	protected String newSessionId() {
+	protected String newSessionToken(final String userId) {
+		return UUID.randomUUID().toString();
+	}
+
+	protected String newUserToken(final String userId) {
 		return UUID.randomUUID().toString();
 	}
 
 	public void register(final SyncArea<?> area) {
-		this.areas.putIfAbsent(area.getId(), area);
+		this.areas.putIfAbsent(area.getAreaId(), area);
 		area.onRegister(this);
 	}
 

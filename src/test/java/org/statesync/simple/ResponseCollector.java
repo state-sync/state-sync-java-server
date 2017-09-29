@@ -19,8 +19,8 @@ public class ResponseCollector implements SyncOutbound {
 	}
 
 	@Override
-	public void send(final String sessionId, final ResponseMessage event) {
-		this.events.add(Pair.of("session:" + sessionId, event));
+	public void send(final String sessionToken, final ResponseMessage event) {
+		this.events.add(Pair.of("session:" + sessionToken, event));
 	}
 
 }

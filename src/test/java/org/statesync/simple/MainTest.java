@@ -31,18 +31,18 @@ public class MainTest {
 		final TestSyncService service = new TestSyncService(protocol);
 		final TestArea area = new TestArea();
 		service.register(area);
-		final String sessionId = service.connect("userA").sessionId;
-		service.handle(sessionId, new SubscribeAreaRequest(cid++, "test"));
+		final String sessionToken = service.connect("userA", "1").sessionToken;
+		service.handle(sessionToken, new SubscribeAreaRequest(cid++, "test"));
 
 		Assert.assertEquals(1, service.getSessionsCount());
 		Assert.assertEquals(1, service.getUserSubscriptionsCount());
 		Assert.assertEquals(1, service.getSessionSubscriptionsCount());
 
 		// check server patch
-		service.handle(sessionId, new PatchAreaRequest(cid, "test", replacePatch("/name", "a")));
-		Assert.assertEquals("a", area.store.get("userA").name);
+		service.handle(sessionToken, new PatchAreaRequest(cid, "test", replacePatch("/name", "a")));
+		Assert.assertEquals("a", TestArea.store.byUser("userA").name);
 
-		service.handle(sessionId, new UnsubscribeAreaRequest(cid, "test"));
+		service.handle(sessionToken, new UnsubscribeAreaRequest(cid, "test"));
 
 		Assert.assertEquals(1, service.getSessionsCount());
 		Assert.assertEquals(0, service.getUserSubscriptionsCount());

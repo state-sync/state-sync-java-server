@@ -3,12 +3,12 @@ package org.statesync.config;
 import lombok.Data;
 
 @Data
-public class SyncAreaConfig {
+public class SyncAreaConfig<Model> {
 	private String channel = "/syncArea/";
 	private String clientLocalPrefix = "$";
 	private String[] clientPush = { "/" };
 	private String id;
-	private Class<?> model;
+	private Class<Model> model;
 	private String serverLocalPrefix = "$";
 	private String[] serverPush = { "/" };
 
