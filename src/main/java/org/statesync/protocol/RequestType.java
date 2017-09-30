@@ -10,7 +10,7 @@ public enum RequestType {
 	 */
 	unsubscribeArea,
 	/**
-	 * Client requested area patch
+	 * Client requested area patch, short name for traffic reduction
 	 */
-	patchArea
+	p
 }

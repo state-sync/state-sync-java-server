@@ -4,7 +4,7 @@ public enum EventType {
 	/**
 	 * Patch area on client side
 	 */
-	patchArea,
+	p,
 	/**
 	 * Initialize session on client side
 	 */

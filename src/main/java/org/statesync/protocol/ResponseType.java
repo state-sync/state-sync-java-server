@@ -18,11 +18,11 @@ public enum ResponseType {
 	 */
 	areaUnsubscriptionSuccess,
 	/**
-	 *
+	 * patchAreaSuccess. Short name is for traffic optimization
 	 */
-	patchAreaSuccess,
+	s,
 	/**
 	 *
 	 */
-	patchAreaError
+	patchAreaError;
 }

@@ -17,7 +17,7 @@ public class PatchAreaRequest extends RequestMessage {
 	public ArrayNode patch;
 
 	public PatchAreaRequest(final int id, final String area, final ArrayNode patch) {
-		super(id, RequestType.patchArea);
+		super(id, RequestType.p);
 		this.area = area;
 		this.patch = patch;
 	}

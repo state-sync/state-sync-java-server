@@ -20,7 +20,6 @@ public class SyncAreaConfig<Model> {
 		final ClientAreaConfig cfg = new ClientAreaConfig();
 		cfg.setClientLocalPrefix(this.clientLocalPrefix);
 		cfg.setClientPush(this.clientPush);
-		cfg.setId(this.id);
 		return cfg;
 	}
 }

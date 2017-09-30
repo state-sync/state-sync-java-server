@@ -12,7 +12,7 @@ public class PatchAreaResponse extends ResponseMessage {
 	public final String area;
 
 	public PatchAreaResponse(final int forId, final String area) {
-		super(forId, ResponseType.patchAreaSuccess);
+		super(forId, ResponseType.s);
 		this.area = area;
 	}
 }

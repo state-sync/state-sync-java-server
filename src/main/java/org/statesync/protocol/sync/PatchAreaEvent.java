@@ -15,7 +15,7 @@ public class PatchAreaEvent extends EventMessage {
 	public ArrayNode patch;
 
 	public PatchAreaEvent(final String area, final ArrayNode patch) {
-		super(EventType.patchArea);
+		super(EventType.p);
 		this.area = area;
 		this.patch = patch;
 	}

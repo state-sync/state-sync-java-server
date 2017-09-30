@@ -17,7 +17,7 @@ public class RequestMessageFactory {
 				return this.mapper.convertValue(json, SubscribeAreaRequest.class);
 			case unsubscribeArea:
 				return this.mapper.convertValue(json, UnsubscribeAreaRequest.class);
-			case patchArea:
+			case p:
 			default:
 				return this.mapper.convertValue(json, PatchAreaRequest.class);
 		}

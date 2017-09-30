@@ -30,7 +30,7 @@ public class SyncSession {
 			case unsubscribeArea:
 				unsubscribeArea((UnsubscribeAreaRequest) event);
 				return;
-			case patchArea:
+			case p:
 			default:
 				patchArea((PatchAreaRequest) event);
 				return;
