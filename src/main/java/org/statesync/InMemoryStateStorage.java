@@ -19,13 +19,18 @@ public class InMemoryStateStorage<Model> implements StateStorage<Model> {
 	}
 
 	@Override
-	public Model load(final SyncAreaUser user) {
-		return this.models.computeIfAbsent(user.userId, id -> this.factory.get());
+	public Model load(final String key) {
+		return this.models.computeIfAbsent(key, id -> this.factory.get());
 	}
 
 	@Override
-	public void save(final Model model, final SyncAreaUser user) {
-		this.models.put(user.userId, model);
+	public void remove(final String key) {
+		this.models.remove(key);
+	}
+
+	@Override
+	public void save(final Model model, final String key) {
+		this.models.put(key, model);
 	}
 
 }

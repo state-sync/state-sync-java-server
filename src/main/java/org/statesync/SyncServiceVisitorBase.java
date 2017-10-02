@@ -18,8 +18,15 @@ public class SyncServiceVisitorBase implements SyncServiceVisitor {
 	}
 
 	@Override
-	public void visit(final SyncAreaUser syncAreaUser) {
+	public <T> void visit(final SyncAreaSession<T> syncAreaSession) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public <T> void visit(final SyncAreaUser<T> syncAreaUser) {
 		// override
+		syncAreaUser.sessions.values().forEach(session -> session.accept(this));
 	}
 
 	@Override

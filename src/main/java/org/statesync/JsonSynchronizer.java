@@ -1,14 +1,10 @@
 package org.statesync;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.diff.JsonDiff;
 
 public class JsonSynchronizer<T> {
@@ -44,7 +40,11 @@ public class JsonSynchronizer<T> {
 		return this.mapper.convertValue(model, this.clazz);
 	}
 
-	public T patch(final T original, final JsonNode patch) throws JsonPatchException, IOException {
-		return model((ObjectNode) JsonPatch.fromJson(patch).apply(json(original)));
+	public T patch(final T original, final ArrayNode patch) {
+		try {
+			return model((ObjectNode) JsonPatch.fromJson(patch).apply(json(original)));
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

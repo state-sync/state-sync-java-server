@@ -8,7 +8,9 @@ public interface SyncServiceVisitor {
 
 	<T> void visit(SyncArea<T> syncArea);
 
-	void visit(SyncAreaUser syncAreaUser);
+	<T> void visit(SyncAreaSession<T> syncAreaSession);
+
+	<T> void visit(SyncAreaUser<T> syncAreaUser);
 
 	void visit(SyncService syncService);
 

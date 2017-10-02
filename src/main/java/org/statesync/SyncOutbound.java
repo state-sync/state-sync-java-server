@@ -1,18 +1,16 @@
 package org.statesync;
 
-import org.statesync.protocol.EventMessage;
-import org.statesync.protocol.ResponseMessage;
+import org.statesync.protocol.Message;
+import org.statesync.protocol.patch.PatchAreaRequest;
+import org.statesync.protocol.patch.PatchAreaResponse;
+import org.statesync.protocol.subscription.AreaSubscriptionError;
+import org.statesync.protocol.subscription.SubscribeAreaFail;
 
 public interface SyncOutbound {
-	/**
-	 * Broadcast event to all sessions of specified user
-	 *
-	 * @param userId
-	 *            - userId
-	 * @param event
-	 *            - event to send
-	 */
-	void broadcast(final String userToken, final EventMessage event);
+
+	default void confirmPatch(final String sessionToken, final PatchAreaRequest event) {
+		send(sessionToken, new PatchAreaResponse(event.id, event.area));
+	}
 
 	/**
 	 * Send event to particular session
@@ -22,5 +20,10 @@ public interface SyncOutbound {
 	 * @param event
 	 *            - event to send
 	 */
-	void send(final String sessionToken, final ResponseMessage event);
+	void send(final String sessionToken, final Message event);
+
+	default void sendSubscribeAreaFail(final String sessionToken, final int forId, final String areaId,
+			final AreaSubscriptionError error) {
+		send(sessionToken, new SubscribeAreaFail(forId, areaId, error));
+	}
 }

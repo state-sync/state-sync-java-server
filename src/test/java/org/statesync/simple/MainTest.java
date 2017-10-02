@@ -40,7 +40,7 @@ public class MainTest {
 
 		// check server patch
 		service.handle(sessionToken, new PatchAreaRequest(cid, "test", replacePatch("/name", "a")));
-		Assert.assertEquals("a", TestArea.store.byUser("userA").name);
+		Assert.assertEquals("a", TestArea.userStorage.byUser("userA").name);
 
 		service.handle(sessionToken, new UnsubscribeAreaRequest(cid, "test"));
 
