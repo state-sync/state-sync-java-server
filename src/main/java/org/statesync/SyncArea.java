@@ -99,6 +99,10 @@ public class SyncArea<Model> {
 		areaSession.subscribe(event);
 	}
 
+	public void syncAll() {
+		syncAll(null);
+	}
+
 	public void syncAll(final StateProcessor<Model> synchronizer) {
 		this.users.forEach((k, user) -> {
 			user.sync(synchronizer);
