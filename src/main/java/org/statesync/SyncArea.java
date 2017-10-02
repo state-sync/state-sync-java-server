@@ -44,6 +44,10 @@ public class SyncArea<Model> {
 		this.synchronizer = new JsonSynchronizer<>(config.getModel());
 	}
 
+	public void accept(final SyncServiceVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	protected boolean checkPermissions(final String userId) {
 		return true;
 	}
@@ -80,9 +84,9 @@ public class SyncArea<Model> {
 	}
 
 	public void patchArea(final SyncSession session, final PatchAreaRequest request) {
-		final SyncAreaUser user = this.users.get(session.userId);
+		final SyncAreaUser user = this.users.get(session.user.userId);
 		if (user == null) {
-			this.service.disconnectUser(session.userId);
+			this.service.disconnectUser(session.user.userId);
 			return;
 		}
 		try {
@@ -96,7 +100,7 @@ public class SyncArea<Model> {
 			if (patch.size() > 0) {
 				final EventMessage event = new PatchAreaEvent(this.areaId, patch);
 				// broadcast to all user sessions
-				this.service.protocol.broadcast(session.userToken, event);
+				this.service.protocol.broadcast(session.user.userToken, event);
 			}
 			// send confirmation to original session
 			this.service.protocol.send(session.sessionToken, new PatchAreaResponse(request.id, this.areaId));
@@ -112,16 +116,15 @@ public class SyncArea<Model> {
 		final String sessionToken = session.sessionToken;
 
 		// security
-		if (!checkPermissions(session.userId)) {
+		if (!checkPermissions(session.user.userId)) {
 			this.service.protocol.send(sessionToken,
 					new SubscribeAreaFail(event.id, this.areaId, AreaSubscriptionError.accessDenied));
 			return;
 		}
 
 		// link
-		final SyncAreaUser user = this.users.computeIfAbsent(session.userId,
-				id -> new SyncAreaUser(session.userId, this.service.newUserToken(session.userId)));
-		this.sessions.put(sessionToken, session);
+		final SyncAreaUser user = this.users.computeIfAbsent(session.user.userId,
+				id -> new SyncAreaUser(session.user.userId, this.service.newUserToken(session.user.userId)));
 		user.sessions.put(sessionToken, session);
 
 		// sync model
@@ -139,7 +142,8 @@ public class SyncArea<Model> {
 
 	public void sync(final SyncAreaUser user, final Synchronizer<Model> synchronizer) {
 		final Model original = this.storage.load(user);
-		final Model updated = this.processor.process(original, user);
+		Model updated = this.synchronizer.clone(original);
+		updated = this.processor.process(updated, user);
 		ArrayNode patch = this.synchronizer.diff(original, updated);
 		if (patch.size() > 0) {
 			this.storage.save(updated, user);
@@ -166,7 +170,7 @@ public class SyncArea<Model> {
 
 		// unlink
 		this.sessions.remove(session.sessionToken);
-		this.users.computeIfPresent(session.userId, (id, user) -> user.remove(session) ? null : user);
+		this.users.computeIfPresent(session.user.userId, (id, user) -> user.remove(session) ? null : user);
 
 		// response
 		final UnsubscribeAreaResponse response = new UnsubscribeAreaResponse(event.id, this.areaId);

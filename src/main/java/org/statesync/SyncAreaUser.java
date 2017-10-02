@@ -16,6 +16,10 @@ public class SyncAreaUser {
 		this.userToken = userToken;
 	}
 
+	public void accept(final SyncServiceVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public boolean remove(final SyncSession session) {
 		this.sessions.remove(session.sessionToken);
 		return this.sessions.isEmpty();

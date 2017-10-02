@@ -24,6 +24,10 @@ public class JsonSynchronizer<T> {
 		this.mapper.setSerializationInclusion(Include.ALWAYS);
 	}
 
+	public void accept(final SyncServiceVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public T clone(final T model) {
 		return model(json(model));
 	}

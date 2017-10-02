@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.statesync.info.StateSyncInfo;
 import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 
@@ -12,29 +13,54 @@ import lombok.NonNull;
 
 public class SyncService {
 	final Map<String, SyncArea<?>> areas = new ConcurrentHashMap<>();
-	private final Map<String, SyncSession> sessions = new ConcurrentHashMap<>();
+	final SessionMap sessions = new SessionMap();
+	final Map<String, SyncServiceUser> users = new ConcurrentHashMap<>();
+
 	SyncOutbound protocol;
 
 	public SyncService(final @NonNull SyncOutbound protocol) {
 		this.protocol = protocol;
 	}
 
+	public void accept(final SyncServiceVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId) {
-		final SyncSession session = newSession(userId, externalSessionId);
-		this.sessions.put(session.sessionToken, session);
+
+		final SyncServiceUser user = this.users.computeIfAbsent(userId,
+				id -> new SyncServiceUser(userId, newUserToken(userId)));
+		final SyncSession session = newSession(user, externalSessionId);
+		this.sessions.add(session);
 		return session.init();
 	}
 
-	public void disconnectSession(final String userId) {
-		// TODO Auto-generated method stub
+	public void disconnectSession(final String externalSessionId) {
+		final SyncSession session = this.sessions.removeByExternalSessionId(externalSessionId);
+		this.users.entrySet().removeIf(entry -> entry.getValue().onSessionDisconnect(session));
 	}
 
 	public void disconnectUser(final String userId) {
-		// TODO Auto-generated method stub
+		this.users.remove(userId);
+		this.sessions.removeByUserId(userId);
+	}
+
+	public SyncArea<?> findArea(final String area) {
+		final SyncArea<?> syncArea = this.areas.get(area);
+		if (syncArea == null) {
+			throw new SyncException("Unknown sync area:" + area);
+		}
+		return syncArea;
 	}
 
 	public int getAreasCount() {
 		return this.areas.size();
+	}
+
+	public StateSyncInfo getInfo() {
+		final StateSyncInfoBuilder visitor = new StateSyncInfoBuilder();
+		accept(visitor);
+		return visitor.model;
 	}
 
 	public int getSessionsCount() {
@@ -52,14 +78,18 @@ public class SyncService {
 	}
 
 	public void handle(@NonNull final String sessionToken, final RequestMessage event) {
-		this.sessions.get(sessionToken).handle(event);
+		final SyncSession session = this.sessions.getByToken(sessionToken);
+		if (session == null) {
+			throw new SyncException("Unknown sessionToken:" + sessionToken);
+		}
+		session.handle(event);
 	}
 
-	protected SyncSession newSession(@NonNull final String userId, final String externalSessionId) {
-		return new SyncSession(this, userId, newSessionToken(userId), newUserToken(userId), externalSessionId);
+	protected SyncSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId) {
+		return new SyncSession(this, user, newSessionToken(user), externalSessionId);
 	}
 
-	protected String newSessionToken(final String userId) {
+	protected String newSessionToken(final SyncServiceUser user) {
 		return UUID.randomUUID().toString();
 	}
 
@@ -68,6 +98,9 @@ public class SyncService {
 	}
 
 	public void register(final SyncArea<?> area) {
+		if (this.areas.containsKey(area.getAreaId())) {
+			throw new SyncException("Redeclaration of area:" + area.getAreaId());
+		}
 		this.areas.putIfAbsent(area.getAreaId(), area);
 		area.onRegister(this);
 	}
