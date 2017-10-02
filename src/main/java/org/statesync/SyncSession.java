@@ -4,6 +4,7 @@ import org.statesync.info.SyncSessionInfo;
 import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 import org.statesync.protocol.patch.PatchAreaRequest;
+import org.statesync.protocol.singnal.SignalRequest;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 
@@ -41,6 +42,9 @@ public class SyncSession {
 			case unsubscribeArea:
 				unsubscribeArea((UnsubscribeAreaRequest) event);
 				return;
+			case signal:
+				signal((SignalRequest) event);
+				return;
 			case p:
 			default:
 				patchArea((PatchAreaRequest) event);
@@ -54,6 +58,10 @@ public class SyncSession {
 
 	private void patchArea(final PatchAreaRequest event) {
 		this.service.findArea(event.area).patchArea(this, event);
+	}
+
+	private void signal(final SignalRequest event) {
+		this.service.findArea(event.area).signal(this, event);
 	}
 
 	private void subscribeArea(final SubscribeAreaRequest event) {

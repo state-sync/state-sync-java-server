@@ -24,5 +24,5 @@ public enum ResponseType {
 	/**
 	 *
 	 */
-	patchAreaError;
+	patchAreaError, signalError, signalResponse;
 }

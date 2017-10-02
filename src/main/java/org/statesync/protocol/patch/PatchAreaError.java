@@ -8,11 +8,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PatchAreaFail extends ResponseMessage {
+public class PatchAreaError extends ResponseMessage {
 	public final String area;
-	public final PatchError error;
+	public final PatchErrorCode error;
 
-	public PatchAreaFail(final int forId, final String area, final PatchError error) {
+	public PatchAreaError(final int forId, final String area, final PatchErrorCode error) {
 		super(forId, ResponseType.patchAreaError);
 		this.area = area;
 		this.error = error;

@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.config.SyncAreaConfig;
 import org.statesync.protocol.patch.PatchAreaRequest;
+import org.statesync.protocol.singnal.SignalRequest;
 import org.statesync.protocol.subscription.AreaSubscriptionError;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
@@ -68,6 +69,10 @@ public class SyncArea<Model> {
 
 	public void patchArea(final SyncSession session, final PatchAreaRequest event) {
 		this.users.get(session.user.userId).patch(session.sessionToken, event);
+	}
+
+	public void signal(final SyncSession session, final SignalRequest event) {
+		this.users.get(session.user.userId).signal(session.sessionToken, event);
 	}
 
 	public void subscribeSession(final SyncSession session, final SubscribeAreaRequest event) {

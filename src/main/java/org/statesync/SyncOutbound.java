@@ -3,13 +3,19 @@ package org.statesync;
 import org.statesync.protocol.Message;
 import org.statesync.protocol.patch.PatchAreaRequest;
 import org.statesync.protocol.patch.PatchAreaResponse;
+import org.statesync.protocol.singnal.SignalRequest;
+import org.statesync.protocol.singnal.SignalResponse;
 import org.statesync.protocol.subscription.AreaSubscriptionError;
-import org.statesync.protocol.subscription.SubscribeAreaFail;
+import org.statesync.protocol.subscription.SubscribeAreaError;
 
 public interface SyncOutbound {
 
 	default void confirmPatch(final String sessionToken, final PatchAreaRequest event) {
 		send(sessionToken, new PatchAreaResponse(event.id, event.area));
+	}
+
+	default void confirmSignal(final String sessionToken, final SignalRequest event) {
+		send(sessionToken, new SignalResponse(event.id, event.area));
 	}
 
 	/**
@@ -24,6 +30,6 @@ public interface SyncOutbound {
 
 	default void sendSubscribeAreaFail(final String sessionToken, final int forId, final String areaId,
 			final AreaSubscriptionError error) {
-		send(sessionToken, new SubscribeAreaFail(forId, areaId, error));
+		send(sessionToken, new SubscribeAreaError(forId, areaId, error));
 	}
 }

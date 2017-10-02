@@ -1,5 +1,5 @@
 package org.statesync.protocol.patch;
 
-public enum PatchError {
+public enum PatchErrorCode {
 	unknown
 }

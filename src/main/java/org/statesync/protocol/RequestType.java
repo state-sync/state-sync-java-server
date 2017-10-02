@@ -12,5 +12,9 @@ public enum RequestType {
 	/**
 	 * Client requested area patch, short name for traffic reduction
 	 */
-	p
+	p,
+	/**
+	 * Client send signal to server
+	 */
+	signal
 }

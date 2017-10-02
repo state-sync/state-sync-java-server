@@ -5,8 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.protocol.patch.PatchAreaRequest;
+import org.statesync.protocol.singnal.SignalRequest;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SyncAreaUser<Model> {
 	public final Map<String, SyncAreaSession<Model>> sessions = new ConcurrentHashMap<>();
@@ -43,6 +45,11 @@ public class SyncAreaUser<Model> {
 		return this.area.getClientConfig(this);
 	}
 
+	protected Model handleSignal(final Model model, final SyncAreaUser<Model> user, final String signal,
+			final ObjectNode parameters) {
+		return model;
+	}
+
 	public Model load() {
 		final String userId = this.user.userId;
 		synchronized (this.userLock) {
@@ -72,6 +79,13 @@ public class SyncAreaUser<Model> {
 	public boolean remove(final SyncSession session) {
 		this.sessions.remove(session.sessionToken);
 		return this.sessions.isEmpty();
+	}
+
+	public void signal(final String sessionToken, final SignalRequest event) {
+		sync((model, user) -> {
+			return handleSignal(model, user, event.signal, event.parameters);
+		});
+		this.protocol.confirmSignal(sessionToken, event);
 	}
 
 	/**
