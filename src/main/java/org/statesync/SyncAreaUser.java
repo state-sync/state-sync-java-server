@@ -6,7 +6,7 @@ import java.util.logging.Level;
 
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.protocol.patch.PatchAreaRequest;
-import org.statesync.protocol.singnal.SignalRequest;
+import org.statesync.protocol.signal.SignalRequest;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,11 +49,6 @@ public class SyncAreaUser<Model> {
 		return this.area.getClientConfig(this);
 	}
 
-	protected Model handleSignal(final Model model, final SyncAreaUser<Model> user, final String signal,
-			final ObjectNode parameters) {
-		return model;
-	}
-
 	public Model load() {
 		final String userId = this.user.userId;
 		synchronized (this.userLock) {
@@ -87,7 +82,7 @@ public class SyncAreaUser<Model> {
 
 	public void signal(final String sessionToken, final SignalRequest event) {
 		sync((model, user) -> {
-			return handleSignal(model, user, event.signal, event.parameters);
+			return this.area.handleSignal(model, user, event.signal, event.parameters);
 		});
 		this.protocol.confirmSignal(sessionToken, event);
 	}

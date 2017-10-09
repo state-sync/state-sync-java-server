@@ -1,4 +1,4 @@
-package org.statesync.protocol.singnal;
+package org.statesync.protocol.signal;
 
 import org.statesync.protocol.ResponseMessage;
 import org.statesync.protocol.ResponseType;

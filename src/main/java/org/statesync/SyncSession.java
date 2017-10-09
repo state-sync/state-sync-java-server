@@ -4,7 +4,7 @@ import org.statesync.info.SyncSessionInfo;
 import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 import org.statesync.protocol.patch.PatchAreaRequest;
-import org.statesync.protocol.singnal.SignalRequest;
+import org.statesync.protocol.signal.SignalRequest;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 

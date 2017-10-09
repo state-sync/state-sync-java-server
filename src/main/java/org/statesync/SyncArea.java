@@ -6,12 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.config.SyncAreaConfig;
 import org.statesync.protocol.patch.PatchAreaRequest;
-import org.statesync.protocol.singnal.SignalRequest;
+import org.statesync.protocol.signal.SignalRequest;
 import org.statesync.protocol.subscription.AreaSubscriptionError;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaResponse;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Supplier;
 
 import lombok.extern.java.Log;
@@ -30,13 +31,16 @@ public class SyncArea<Model> {
 	StateStorage sessionStorage;
 	StateReducer<Model> processor;
 	public Supplier<Model> factory;
+	private SignalHandler<Model> signalHandler;
 
 	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage userStorage,
-			final StateStorage sessionStorage, final StateReducer<Model> processor) {
+			final StateStorage sessionStorage, final StateReducer<Model> processor,
+			final SignalHandler<Model> signalHandler) {
 		this.config = config;
 		this.userStorage = userStorage;
 		this.sessionStorage = sessionStorage;
 		this.processor = processor;
+		this.signalHandler = signalHandler;
 		this.areaId = config.getId();
 		this.factory = () -> {
 			try {
@@ -71,6 +75,11 @@ public class SyncArea<Model> {
 
 	public int getUsersCount() {
 		return this.users.size();
+	}
+
+	public Model handleSignal(final Model model, final SyncAreaUser<Model> user, final String signal,
+			final ObjectNode parameters) {
+		return this.signalHandler.handle(model, user, signal, parameters);
 	}
 
 	protected void onRegister(final SyncService service) {

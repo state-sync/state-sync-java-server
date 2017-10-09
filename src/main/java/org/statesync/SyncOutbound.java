@@ -3,8 +3,8 @@ package org.statesync;
 import org.statesync.protocol.Message;
 import org.statesync.protocol.patch.PatchAreaRequest;
 import org.statesync.protocol.patch.PatchAreaResponse;
-import org.statesync.protocol.singnal.SignalRequest;
-import org.statesync.protocol.singnal.SignalResponse;
+import org.statesync.protocol.signal.SignalRequest;
+import org.statesync.protocol.signal.SignalResponse;
 import org.statesync.protocol.subscription.AreaSubscriptionError;
 import org.statesync.protocol.subscription.SubscribeAreaError;
 
