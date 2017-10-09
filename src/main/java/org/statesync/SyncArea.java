@@ -28,11 +28,11 @@ public class SyncArea<Model> {
 	private SyncAreaConfig<Model> config;
 	StateStorage userStorage;
 	StateStorage sessionStorage;
-	StateProcessor<Model> processor;
+	StateReducer<Model> processor;
 	public Supplier<Model> factory;
 
 	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage userStorage,
-			final StateStorage sessionStorage, final StateProcessor<Model> processor) {
+			final StateStorage sessionStorage, final StateReducer<Model> processor) {
 		this.config = config;
 		this.userStorage = userStorage;
 		this.sessionStorage = sessionStorage;
@@ -113,7 +113,7 @@ public class SyncArea<Model> {
 		syncAll(null);
 	}
 
-	public void syncAll(final StateProcessor<Model> synchronizer) {
+	public void syncAll(final StateReducer<Model> synchronizer) {
 		this.users.forEach((k, user) -> {
 			user.sync(synchronizer);
 		});

@@ -19,7 +19,7 @@ public class SyncAreaUser<Model> {
 
 	private StateStorage userStorage;
 
-	private StateProcessor<Model> processor;
+	private StateReducer<Model> processor;
 
 	private final Object userLock = new Object();
 
@@ -59,7 +59,7 @@ public class SyncAreaUser<Model> {
 		synchronized (this.userLock) {
 			final ObjectNode json = this.userStorage.load(userId);
 			if (json == null) {
-				final Model original = this.processor.process(this.area.factory.get(), this);
+				final Model original = this.processor.reduce(this.area.factory.get(), this);
 				final ObjectNode updatedJson = this.synchronizer.json(original);
 				this.userStorage.save(this.user.userId, updatedJson);
 				return original;
@@ -101,7 +101,7 @@ public class SyncAreaUser<Model> {
 	 *
 	 * @param enchancer
 	 */
-	public void sync(final StateProcessor<Model> enchancer) {
+	public void sync(final StateReducer<Model> enchancer) {
 		synchronized (this.userLock) {
 			try {
 				// load model
@@ -111,9 +111,9 @@ public class SyncAreaUser<Model> {
 				// apply client patch
 				if (enchancer != null) {
 					// updated = this.processor.process(updated, this);
-					updated = enchancer.process(updated, this);
+					updated = enchancer.reduce(updated, this);
 				}
-				updated = this.processor.process(updated, this);
+				updated = this.processor.reduce(updated, this);
 
 				// save if required
 				final ArrayNode spatch = this.synchronizer.diff(original, updated);
