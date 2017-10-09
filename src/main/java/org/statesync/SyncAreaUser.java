@@ -2,6 +2,7 @@ package org.statesync;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.protocol.patch.PatchAreaRequest;
@@ -10,10 +11,13 @@ import org.statesync.protocol.singnal.SignalRequest;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.extern.java.Log;
+
+@Log
 public class SyncAreaUser<Model> {
 	public final Map<String, SyncAreaSession<Model>> sessions = new ConcurrentHashMap<>();
 
-	private StateStorage<Model> userStorage;
+	private StateStorage userStorage;
 
 	private StateProcessor<Model> processor;
 
@@ -53,14 +57,15 @@ public class SyncAreaUser<Model> {
 	public Model load() {
 		final String userId = this.user.userId;
 		synchronized (this.userLock) {
-			final Model original = this.userStorage.load(userId);
-			Model updated = this.synchronizer.clone(original);
-			updated = this.processor.process(updated, this);
-			final ArrayNode patch = this.synchronizer.diff(original, updated);
-			if (patch.size() > 0) {
-				this.userStorage.save(updated, this.user.userId);
+			final ObjectNode json = this.userStorage.load(userId);
+			if (json == null) {
+				final Model original = this.processor.process(this.area.factory.get(), this);
+				final ObjectNode updatedJson = this.synchronizer.json(original);
+				this.userStorage.save(this.user.userId, updatedJson);
+				return original;
+			} else {
+				return this.synchronizer.model(json);
 			}
-			return updated;
 		}
 	}
 
@@ -73,7 +78,6 @@ public class SyncAreaUser<Model> {
 	public void patch(final String sessionToken, final PatchAreaRequest event) {
 		patch(event.patch);
 		this.protocol.confirmPatch(sessionToken, event);
-
 	}
 
 	public boolean remove(final SyncSession session) {
@@ -99,24 +103,28 @@ public class SyncAreaUser<Model> {
 	 */
 	public void sync(final StateProcessor<Model> enchancer) {
 		synchronized (this.userLock) {
-			// load model
-			final Model original = this.userStorage.load(this.user.userId);
-			Model updated = this.synchronizer.clone(original);
+			try {
+				// load model
+				final Model original = load();
+				Model updated = this.synchronizer.clone(original);
 
-			// apply client patch
-			if (enchancer != null) {
+				// apply client patch
+				if (enchancer != null) {
+					// updated = this.processor.process(updated, this);
+					updated = enchancer.process(updated, this);
+				}
 				updated = this.processor.process(updated, this);
-				updated = enchancer.process(updated, this);
-			}
-			updated = this.processor.process(updated, this);
 
-			// save if required
-			final ArrayNode spatch = this.synchronizer.diff(original, updated);
-			if (spatch.size() > 0) {
-				this.userStorage.save(updated, this.user.userId);
+				// save if required
+				final ArrayNode spatch = this.synchronizer.diff(original, updated);
+				if (spatch.size() > 0) {
+					this.userStorage.save(this.user.userId, this.synchronizer.json(updated));
+				}
+				final Model nv = updated;
+				this.sessions.values().forEach(session -> session.onChange(nv));
+			} catch (final Exception e) {
+				log.log(Level.SEVERE, "sync failed", e);
 			}
-			final Model nv = updated;
-			this.sessions.values().forEach(session -> session.onChange(nv));
 		}
 	}
 }

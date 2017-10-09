@@ -3,24 +3,15 @@ package org.statesync;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.base.Supplier;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class InMemoryStateStorage<Model> implements StateStorage<Model> {
+public class InMemoryStateStorage implements StateStorage {
 
-	private final Map<String, Model> models = new ConcurrentHashMap<>();
-	private Supplier<Model> factory;
-
-	public InMemoryStateStorage(final Supplier<Model> factory) {
-		this.factory = factory;
-	}
-
-	public Model byUser(final String userId) {
-		return this.models.get(userId);
-	}
+	private final Map<String, ObjectNode> models = new ConcurrentHashMap<>();
 
 	@Override
-	public Model load(final String key) {
-		return this.models.computeIfAbsent(key, id -> this.factory.get());
+	public ObjectNode load(final String key) {
+		return this.models.get(key);
 	}
 
 	@Override
@@ -29,8 +20,8 @@ public class InMemoryStateStorage<Model> implements StateStorage<Model> {
 	}
 
 	@Override
-	public void save(final Model model, final String key) {
-		this.models.put(key, model);
+	public void save(final String key, final ObjectNode json) {
+		this.models.put(key, json);
 	}
 
 }

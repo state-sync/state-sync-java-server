@@ -12,6 +12,8 @@ import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaResponse;
 
+import com.google.common.base.Supplier;
+
 import lombok.extern.java.Log;
 
 @Log
@@ -24,17 +26,25 @@ public class SyncArea<Model> {
 	protected final JsonSynchronizer<Model> synchronizer;
 
 	private SyncAreaConfig<Model> config;
-	StateStorage<Model> userStorage;
-	StateStorage<Model> sessionStorage;
+	StateStorage userStorage;
+	StateStorage sessionStorage;
 	StateProcessor<Model> processor;
+	public Supplier<Model> factory;
 
-	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage<Model> userStorage,
-			final StateStorage<Model> sessionStorage, final StateProcessor<Model> processor) {
+	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage userStorage,
+			final StateStorage sessionStorage, final StateProcessor<Model> processor) {
 		this.config = config;
 		this.userStorage = userStorage;
 		this.sessionStorage = sessionStorage;
 		this.processor = processor;
 		this.areaId = config.getId();
+		this.factory = () -> {
+			try {
+				return this.config.getModel().newInstance();
+			} catch (final Exception e) {
+				throw new RuntimeException(e);
+			}
+		};
 		this.synchronizer = new JsonSynchronizer<>(config.getModel());
 		log.info("Area initialized:" + this.config);
 	}

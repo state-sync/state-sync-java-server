@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SyncAreaSession<Model> {
 
-	private StateStorage<Model> sessionStorage;
+	private StateStorage sessionStorage;
 
 	private SyncSession session;
 
@@ -50,10 +50,10 @@ public class SyncAreaSession<Model> {
 
 	public void onChange(final Model updated) {
 		final String sessionToken = this.session.sessionToken;
-		final Model shadow = this.sessionStorage.load(this.session.sessionToken);
+		final Model shadow = this.synchronizer.model(this.sessionStorage.load(this.session.sessionToken));
 		ArrayNode patch = this.synchronizer.diff(shadow, updated);
 		if (patch.size() > 0) {
-			this.sessionStorage.save(updated, sessionToken);
+			this.sessionStorage.save(sessionToken, this.synchronizer.json(updated));
 		}
 		patch = filterOutputModel(patch);
 		if (patch.size() > 0) {
@@ -72,7 +72,7 @@ public class SyncAreaSession<Model> {
 		// load user model
 		final Model model = this.user.load();
 		// Store model into session storage
-		this.sessionStorage.save(model, sessionToken);
+		this.sessionStorage.save(sessionToken, this.synchronizer.json(model));
 		final ObjectNode json = filterOutputModel(this.synchronizer.json(model));
 
 		// response

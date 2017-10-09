@@ -26,6 +26,11 @@ public class InitSessionResponse extends EventMessage {
 	 */
 	public final String userToken;
 
+	/**
+	 * Protocol version
+	 */
+	public final String protocolVersion = "1.0";
+
 	public InitSessionResponse(final String sessionToken, final String userToken) {
 		super(EventType.init);
 		this.sessionToken = sessionToken;

@@ -7,8 +7,8 @@ import org.statesync.config.SyncAreaConfig;
 
 public class TestArea extends SyncArea<TestModel> {
 	static final SyncAreaConfig<TestModel> config = new SyncAreaConfig<>();
-	static InMemoryStateStorage<TestModel> sessionStorage = new InMemoryStateStorage<>(TestModel::new);
-	static InMemoryStateStorage<TestModel> userStorage = new InMemoryStateStorage<>(TestModel::new);
+	static InMemoryStateStorage sessionStorage = new InMemoryStateStorage();
+	static InMemoryStateStorage userStorage = new InMemoryStateStorage();
 	static {
 		config.setId("test");
 		config.setModel(TestModel.class);
