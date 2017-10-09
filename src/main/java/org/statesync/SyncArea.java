@@ -17,29 +17,83 @@ import com.google.common.base.Supplier;
 
 import lombok.extern.java.Log;
 
+/**
+ * Sync area. Process sync between server model and user sessions.
+ *
+ * @author ify
+ *
+ * @param <Model>
+ */
 @Log
 public class SyncArea<Model> {
+	/**
+	 * User subscribed to area. Each user use own copy of area model.
+	 */
 	private final Map<String, SyncAreaUser<Model>> users = new ConcurrentHashMap<>();
+	/**
+	 * User sessions subscribed to area.
+	 */
 	private final Map<String, SyncAreaSession<Model>> sessions = new ConcurrentHashMap<>();
 
+	/**
+	 * Sync service reference
+	 */
 	SyncService service;
+	/**
+	 * Unique area id
+	 */
 	private final String areaId;
+	/**
+	 * Synchronizer of model
+	 */
 	protected final JsonSynchronizer<Model> synchronizer;
 
+	/**
+	 * Area configuration
+	 */
 	private SyncAreaConfig<Model> config;
-	StateStorage userStorage;
-	StateStorage sessionStorage;
-	StateReducer<Model> processor;
-	public Supplier<Model> factory;
-	private SignalHandler<Model> signalHandler;
+	/**
+	 * User storage
+	 */
+	final StateStorage userStorage;
+	/**
+	 * Session storage
+	 */
+	final StateStorage sessionStorage;
+	/**
+	 * Model reducer
+	 */
+	final StateReducer<Model> reducer;
+	/**
+	 * New model factory
+	 */
+	final Supplier<Model> factory;
+	/**
+	 * Signal handler
+	 */
+	private final SignalHandler<Model> signalHandler;
 
+	/**
+	 * Construct new sync area.
+	 *
+	 * @param config
+	 *            - area configuration
+	 * @param userStorage
+	 *            - user data storage
+	 * @param sessionStorage
+	 *            - session data storage
+	 * @param reducer
+	 *            - model reducer
+	 * @param signalHandler
+	 *            - signal handler
+	 */
 	public SyncArea(final SyncAreaConfig<Model> config, final StateStorage userStorage,
-			final StateStorage sessionStorage, final StateReducer<Model> processor,
+			final StateStorage sessionStorage, final StateReducer<Model> reducer,
 			final SignalHandler<Model> signalHandler) {
 		this.config = config;
 		this.userStorage = userStorage;
 		this.sessionStorage = sessionStorage;
-		this.processor = processor;
+		this.reducer = reducer;
 		this.signalHandler = signalHandler;
 		this.areaId = config.getId();
 		this.factory = () -> {
@@ -86,15 +140,15 @@ public class SyncArea<Model> {
 		this.service = service;
 	}
 
-	public void patchArea(final SyncSession session, final PatchAreaRequest event) {
+	public void patchArea(final SyncServiceSession session, final PatchAreaRequest event) {
 		this.users.get(session.user.userId).patch(session.sessionToken, event);
 	}
 
-	public void signal(final SyncSession session, final SignalRequest event) {
+	public void signal(final SyncServiceSession session, final SignalRequest event) {
 		this.users.get(session.user.userId).signal(session.sessionToken, event);
 	}
 
-	public void subscribeSession(final SyncSession session, final SubscribeAreaRequest event) {
+	public void subscribeSession(final SyncServiceSession session, final SubscribeAreaRequest event) {
 		final String sessionToken = session.sessionToken;
 
 		// security
@@ -132,7 +186,7 @@ public class SyncArea<Model> {
 		this.service = null;
 	}
 
-	public void unsubscribeSession(final SyncSession session, final UnsubscribeAreaRequest event) {
+	public void unsubscribeSession(final SyncServiceSession session, final UnsubscribeAreaRequest event) {
 
 		// unlink
 		this.sessions.remove(session.sessionToken);

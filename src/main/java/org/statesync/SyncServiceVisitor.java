@@ -16,6 +16,6 @@ public interface SyncServiceVisitor {
 
 	void visit(SyncServiceUser syncServiceUser);
 
-	void visit(SyncSession syncSession);
+	void visit(SyncServiceSession syncSession);
 
 }

@@ -42,7 +42,7 @@ public class SyncServiceVisitorBase implements SyncServiceVisitor {
 	}
 
 	@Override
-	public void visit(final SyncSession syncSession) {
+	public void visit(final SyncServiceSession syncSession) {
 		// override
 	}
 

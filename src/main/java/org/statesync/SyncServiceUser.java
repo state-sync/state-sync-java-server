@@ -11,17 +11,17 @@ import lombok.Data;
 public class SyncServiceUser {
 	public final String userId;
 	public final String userToken;
-	public final Map<String, SyncSession> sessions = new ConcurrentHashMap<>();
+	public final Map<String, SyncServiceSession> sessions = new ConcurrentHashMap<>();
 
 	public void accept(final SyncServiceVisitor visitor) {
 		visitor.visit(this);
 	}
 
-	public void addSession(final SyncSession session) {
+	public void addSession(final SyncServiceSession session) {
 		this.sessions.put(session.sessionToken, session);
 	}
 
-	public boolean onSessionDisconnect(final SyncSession session) {
+	public boolean onSessionDisconnect(final SyncServiceSession session) {
 		this.sessions.remove(session.sessionToken);
 		return this.sessions.isEmpty();
 	}

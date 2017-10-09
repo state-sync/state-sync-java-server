@@ -37,7 +37,7 @@ public class SyncAreaUser<Model> {
 		this.area = area;
 		this.userStorage = area.userStorage;
 		this.synchronizer = area.synchronizer;
-		this.processor = area.processor;
+		this.processor = area.reducer;
 		this.protocol = area.service.protocol;
 	}
 
@@ -75,7 +75,7 @@ public class SyncAreaUser<Model> {
 		this.protocol.confirmPatch(sessionToken, event);
 	}
 
-	public boolean remove(final SyncSession session) {
+	public boolean remove(final SyncServiceSession session) {
 		this.sessions.remove(session.sessionToken);
 		return this.sessions.isEmpty();
 	}

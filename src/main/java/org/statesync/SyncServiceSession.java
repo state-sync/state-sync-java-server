@@ -8,13 +8,13 @@ import org.statesync.protocol.signal.SignalRequest;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 
-public class SyncSession {
+public class SyncServiceSession {
 	public final String sessionToken;
 	public SyncService service;
 	public String externalSessionId;
 	public final SyncServiceUser user;
 
-	public SyncSession(final SyncService service, final SyncServiceUser user, final String sessionToken,
+	public SyncServiceSession(final SyncService service, final SyncServiceUser user, final String sessionToken,
 			final String externalSessionId) {
 		this.service = service;
 		this.user = user;

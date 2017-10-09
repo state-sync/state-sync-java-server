@@ -16,11 +16,11 @@ public class SessionMap {
 	/**
 	 * Store session by token
 	 */
-	private final Map<String, SyncSession> byToken = new ConcurrentHashMap<>();
+	private final Map<String, SyncServiceSession> byToken = new ConcurrentHashMap<>();
 	/**
 	 * Store session by external session id
 	 */
-	private final Map<String, SyncSession> byExternalSessionId = new ConcurrentHashMap<>();
+	private final Map<String, SyncServiceSession> byExternalSessionId = new ConcurrentHashMap<>();
 
 	/**
 	 * Accept visitor
@@ -37,7 +37,7 @@ public class SessionMap {
 	 * @param session
 	 *            - session to store
 	 */
-	public void add(final SyncSession session) {
+	public void add(final SyncServiceSession session) {
 		this.byToken.put(session.sessionToken, session);
 		this.byExternalSessionId.put(session.externalSessionId, session);
 	}
@@ -48,7 +48,7 @@ public class SessionMap {
 	 * @param sessionToken
 	 * @return session or null
 	 */
-	public SyncSession getByToken(final String sessionToken) {
+	public SyncServiceSession getByToken(final String sessionToken) {
 		return this.byToken.get(sessionToken);
 	}
 
@@ -57,7 +57,7 @@ public class SessionMap {
 	 *
 	 * @return sessions
 	 */
-	public Collection<SyncSession> getSessions() {
+	public Collection<SyncServiceSession> getSessions() {
 		return this.byToken.values();
 	}
 
@@ -69,8 +69,8 @@ public class SessionMap {
 	 *             if sessionId is unknown
 	 * @return
 	 */
-	public synchronized SyncSession removeByExternalSessionId(final String externalSessionId) {
-		final SyncSession session = this.byExternalSessionId.remove(externalSessionId);
+	public synchronized SyncServiceSession removeByExternalSessionId(final String externalSessionId) {
+		final SyncServiceSession session = this.byExternalSessionId.remove(externalSessionId);
 		if (session == null)
 			throw new SyncException("Unknown session for external session id:" + externalSessionId);
 
@@ -85,7 +85,7 @@ public class SessionMap {
 	 */
 	public synchronized void removeByUserId(final String userId) {
 		this.byToken.entrySet().removeIf(entry -> {
-			final SyncSession session = entry.getValue();
+			final SyncServiceSession session = entry.getValue();
 			if (session == null)
 				throw new SyncException("Unknown session for user:" + userId);
 			if (session.disconnectUser(userId)) {

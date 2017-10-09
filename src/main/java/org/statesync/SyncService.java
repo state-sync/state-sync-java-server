@@ -30,13 +30,13 @@ public class SyncService {
 
 		final SyncServiceUser user = this.users.computeIfAbsent(userId,
 				id -> new SyncServiceUser(userId, newUserToken(userId)));
-		final SyncSession session = newSession(user, externalSessionId);
+		final SyncServiceSession session = newSession(user, externalSessionId);
 		this.sessions.add(session);
 		return session.init();
 	}
 
 	public void disconnectSession(final String externalSessionId) {
-		final SyncSession session = this.sessions.removeByExternalSessionId(externalSessionId);
+		final SyncServiceSession session = this.sessions.removeByExternalSessionId(externalSessionId);
 		this.users.entrySet().removeIf(entry -> entry.getValue().onSessionDisconnect(session));
 	}
 
@@ -78,15 +78,15 @@ public class SyncService {
 	}
 
 	public void handle(@NonNull final String sessionToken, final RequestMessage event) {
-		final SyncSession session = this.sessions.getByToken(sessionToken);
+		final SyncServiceSession session = this.sessions.getByToken(sessionToken);
 		if (session == null) {
 			throw new SyncException("Unknown sessionToken:" + sessionToken);
 		}
 		session.handle(event);
 	}
 
-	protected SyncSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId) {
-		return new SyncSession(this, user, newSessionToken(user), externalSessionId);
+	protected SyncServiceSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId) {
+		return new SyncServiceSession(this, user, newSessionToken(user), externalSessionId);
 	}
 
 	protected String newSessionToken(final SyncServiceUser user) {

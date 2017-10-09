@@ -4,6 +4,12 @@ import java.util.ArrayList;
 
 import org.statesync.info.StateSyncInfo;
 
+/**
+ * Information builder
+ * 
+ * @author ify
+ *
+ */
 public class StateSyncInfoBuilder extends SyncServiceVisitorBase {
 	public final StateSyncInfo model = new StateSyncInfo();
 
@@ -14,7 +20,7 @@ public class StateSyncInfoBuilder extends SyncServiceVisitorBase {
 	}
 
 	@Override
-	public void visit(final SyncSession syncSession) {
+	public void visit(final SyncServiceSession syncSession) {
 		this.model.sessions.add(syncSession.getInfo());
 		super.visit(syncSession);
 	}

@@ -13,6 +13,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @FunctionalInterface
 public interface SignalHandler<Model> {
 
+	/**
+	 * Handle signal.
+	 *
+	 * @param model
+	 *            - current model
+	 * @param user
+	 *            - user
+	 * @param signal
+	 *            - signal name
+	 * @param parameters
+	 *            - signal parameters
+	 * @return updated model
+	 */
 	Model handle(Model model, SyncAreaUser<Model> user, String signal, ObjectNode parameters);
 
 }

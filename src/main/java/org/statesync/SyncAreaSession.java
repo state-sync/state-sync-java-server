@@ -13,7 +13,7 @@ public class SyncAreaSession<Model> {
 
 	private StateStorage sessionStorage;
 
-	private SyncSession session;
+	private SyncServiceSession session;
 
 	private JsonSynchronizer<Model> synchronizer;
 
@@ -23,7 +23,7 @@ public class SyncAreaSession<Model> {
 
 	private SyncAreaUser<Model> user;
 
-	public SyncAreaSession(final SyncSession session, final SyncAreaUser<Model> user) {
+	public SyncAreaSession(final SyncServiceSession session, final SyncAreaUser<Model> user) {
 		super();
 		this.session = session;
 		this.user = user;
