@@ -23,10 +23,13 @@ public class SyncAreaSession<Model> {
 
 	private SyncAreaUser<Model> user;
 
+	private JsonFilter jsonFilter;
+
 	public SyncAreaSession(final SyncServiceSession session, final SyncAreaUser<Model> user) {
 		super();
 		this.session = session;
 		this.user = user;
+		this.jsonFilter = user.area.jsonFilter;
 		this.areaId = user.area.getAreaId();
 		this.protocol = user.area.service.protocol;
 		this.synchronizer = user.area.synchronizer;
@@ -38,16 +41,6 @@ public class SyncAreaSession<Model> {
 		visitor.visit(this);
 	}
 
-	private ArrayNode filterOutputModel(final ArrayNode patch) {
-		// TODO: Implement filtering
-		return patch;
-	}
-
-	private ObjectNode filterOutputModel(final ObjectNode json) {
-		// TODO: Implement filtering
-		return json;
-	}
-
 	public void onChange(final Model updated) {
 		final String sessionToken = this.session.sessionToken;
 		final Model shadow = this.synchronizer.model(this.sessionStorage.load(this.session.sessionToken));
@@ -55,7 +48,7 @@ public class SyncAreaSession<Model> {
 		if (patch.size() > 0) {
 			this.sessionStorage.save(sessionToken, this.synchronizer.json(updated));
 		}
-		patch = filterOutputModel(patch);
+		patch = this.jsonFilter.filterPatch(patch);
 		if (patch.size() > 0) {
 			final EventMessage event = new PatchAreaEvent(this.areaId, patch);
 			// send changes sessions
@@ -72,8 +65,9 @@ public class SyncAreaSession<Model> {
 		// load user model
 		final Model model = this.user.load();
 		// Store model into session storage
-		this.sessionStorage.save(sessionToken, this.synchronizer.json(model));
-		final ObjectNode json = filterOutputModel(this.synchronizer.json(model));
+		ObjectNode json = this.synchronizer.json(model);
+		this.sessionStorage.save(sessionToken, json);
+		json = this.jsonFilter.filterModel(json);
 
 		// response
 		final ClientAreaConfig clientConfig = this.user.getClientConfig();

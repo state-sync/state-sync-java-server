@@ -12,5 +12,5 @@ import lombok.Data;
 public class ClientAreaConfig {
 	private String clientLocalPrefix = "$";
 	private String[] clientPush = { "/" };
-	private int timeout = 3000;
+	private int timeout;
 }

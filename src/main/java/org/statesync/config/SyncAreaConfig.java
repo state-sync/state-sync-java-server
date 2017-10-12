@@ -7,6 +7,7 @@ public class SyncAreaConfig<Model> {
 	private String channel = "/syncArea/";
 	private String clientLocalPrefix = "$";
 	private String[] clientPush = { "/" };
+	private int timeout = 60_000;
 	private String id;
 	private Class<Model> model;
 	private String serverLocalPrefix = "$";
@@ -20,6 +21,7 @@ public class SyncAreaConfig<Model> {
 		final ClientAreaConfig cfg = new ClientAreaConfig();
 		cfg.setClientLocalPrefix(this.clientLocalPrefix);
 		cfg.setClientPush(this.clientPush);
+		cfg.setTimeout(this.timeout);
 		return cfg;
 	}
 }

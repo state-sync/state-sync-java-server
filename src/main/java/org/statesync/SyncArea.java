@@ -72,6 +72,10 @@ public class SyncArea<Model> {
 	 * Signal handler
 	 */
 	private final SignalHandler<Model> signalHandler;
+	/**
+	 * Output filter
+	 */
+	final JsonFilter jsonFilter;
 
 	/**
 	 * Construct new sync area.
@@ -91,6 +95,7 @@ public class SyncArea<Model> {
 			final StateStorage sessionStorage, final StateReducer<Model> reducer,
 			final SignalHandler<Model> signalHandler) {
 		this.config = config;
+		this.jsonFilter = new JsonFilter(config.getServerLocalPrefix(), config.getServerPush());
 		this.userStorage = userStorage;
 		this.sessionStorage = sessionStorage;
 		this.reducer = reducer;
@@ -121,6 +126,10 @@ public class SyncArea<Model> {
 
 	protected ClientAreaConfig getClientConfig(final SyncAreaUser<Model> user) {
 		return this.config.getClientConfig();
+	}
+
+	public SyncAreaConfig<Model> getConfig() {
+		return this.config;
 	}
 
 	public int getSessionsCount() {
