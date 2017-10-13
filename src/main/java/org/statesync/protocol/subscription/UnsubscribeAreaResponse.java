@@ -12,7 +12,7 @@ public class UnsubscribeAreaResponse extends ResponseMessage {
 	public final String area;
 
 	public UnsubscribeAreaResponse(final int forId, final String area) {
-		super(forId, ResponseType.areaUnsubscriptionSuccess);
+		super(forId, ResponseType.areaUnsubscription);
 		this.area = area;
 	}
 }

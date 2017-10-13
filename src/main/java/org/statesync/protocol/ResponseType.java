@@ -4,10 +4,6 @@ public enum ResponseType {
 	/**
 	 *
 	 */
-	areaSubscriptionSuccess,
-	/**
-	 *
-	 */
 	areaSubscriptionError,
 	/**
 	 *
@@ -16,7 +12,7 @@ public enum ResponseType {
 	/**
 	 *
 	 */
-	areaUnsubscriptionSuccess,
+	areaUnsubscription,
 	/**
 	 * patchAreaSuccess. Short name is for traffic optimization
 	 */
