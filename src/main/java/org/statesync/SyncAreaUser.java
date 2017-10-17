@@ -71,6 +71,7 @@ public class SyncAreaUser<Model> {
 	}
 
 	public void patch(final String sessionToken, final PatchAreaRequest event) {
+		this.sessions.get(sessionToken).patch(event);
 		patch(event.patch);
 		this.protocol.confirmPatch(sessionToken, event);
 	}

@@ -2,6 +2,7 @@ package org.statesync;
 
 import org.statesync.config.ClientAreaConfig;
 import org.statesync.protocol.EventMessage;
+import org.statesync.protocol.patch.PatchAreaRequest;
 import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.SubscribeAreaResponse;
 import org.statesync.protocol.sync.PatchAreaEvent;
@@ -58,6 +59,12 @@ public class SyncAreaSession<Model> {
 
 	public void onRemove() {
 		this.sessionStorage.remove(this.session.sessionToken);
+	}
+
+	public void patch(final PatchAreaRequest event) {
+		ObjectNode json = this.sessionStorage.load(this.session.sessionToken);
+		json = this.synchronizer.patch(json, event.patch);
+		this.sessionStorage.save(this.session.sessionToken, json);
 	}
 
 	public void subscribe(final SubscribeAreaRequest event) {

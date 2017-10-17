@@ -40,6 +40,14 @@ public class JsonSynchronizer<T> {
 		return this.mapper.convertValue(model, this.clazz);
 	}
 
+	public ObjectNode patch(final ObjectNode json, final ArrayNode patch) {
+		try {
+			return (ObjectNode) JsonPatch.fromJson(patch).apply(json);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public T patch(final T original, final ArrayNode patch) {
 		try {
 			return model((ObjectNode) JsonPatch.fromJson(patch).apply(json(original)));
