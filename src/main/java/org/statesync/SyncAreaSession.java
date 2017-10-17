@@ -62,9 +62,9 @@ public class SyncAreaSession<Model> {
 	}
 
 	public void patch(final PatchAreaRequest event) {
-		ObjectNode json = this.sessionStorage.load(this.session.sessionToken);
-		json = this.synchronizer.patch(json, event.patch);
-		this.sessionStorage.save(this.session.sessionToken, json);
+		final ObjectNode json = this.sessionStorage.load(this.session.sessionToken);
+		final Model model = this.synchronizer.patch(this.synchronizer.model(json), event.patch);
+		this.sessionStorage.save(this.session.sessionToken, this.synchronizer.json(model));
 	}
 
 	public void subscribe(final SubscribeAreaRequest event) {
