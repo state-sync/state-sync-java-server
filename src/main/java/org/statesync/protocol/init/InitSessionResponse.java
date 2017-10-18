@@ -22,18 +22,12 @@ public class InitSessionResponse extends EventMessage {
 	public final String sessionToken;
 
 	/**
-	 * User token
-	 */
-	public final String userToken;
-
-	/**
 	 * Protocol version
 	 */
 	public final String protocolVersion = "1.0";
 
-	public InitSessionResponse(final String sessionToken, final String userToken) {
+	public InitSessionResponse(final String sessionToken) {
 		super(EventType.init);
 		this.sessionToken = sessionToken;
-		this.userToken = userToken;
 	}
 }

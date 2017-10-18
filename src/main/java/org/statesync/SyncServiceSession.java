@@ -53,7 +53,7 @@ public class SyncServiceSession {
 	}
 
 	public InitSessionResponse init() {
-		return new InitSessionResponse(this.sessionToken, this.user.userToken);
+		return new InitSessionResponse(this.sessionToken);
 	}
 
 	private void patchArea(final PatchAreaRequest event) {

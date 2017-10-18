@@ -6,7 +6,6 @@ import org.statesync.SyncServiceUser;
 
 public class TestSyncService extends SyncService {
 	private int sessionToken = 0;
-	private int userToken = 0;
 
 	public TestSyncService(final SyncOutbound protocol) {
 		super(protocol);
@@ -15,10 +14,5 @@ public class TestSyncService extends SyncService {
 	@Override
 	protected String newSessionToken(final SyncServiceUser user) {
 		return "user:" + this.sessionToken++;
-	}
-
-	@Override
-	protected String newUserToken(final String userId) {
-		return "session:" + this.userToken++;
 	}
 }

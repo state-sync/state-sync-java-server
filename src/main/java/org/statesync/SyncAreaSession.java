@@ -49,7 +49,8 @@ public class SyncAreaSession<Model> {
 		// we must filter out server parts before sync.
 		patch = this.jsonFilter.filterPatch(patch);
 		if (patch.size() > 0) {
-			this.sessionStorage.save(sessionToken, this.synchronizer.json(updated));
+			final Model updatedSession = this.synchronizer.patch(shadow, patch);
+			this.sessionStorage.save(sessionToken, this.synchronizer.json(updatedSession));
 			final EventMessage event = new PatchAreaEvent(this.areaId, patch);
 			// send changes sessions
 			this.protocol.send(sessionToken, event);

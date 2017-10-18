@@ -3,6 +3,7 @@ package org.statesync;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.statesync.info.StateSyncInfo;
@@ -10,7 +11,9 @@ import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 
 import lombok.NonNull;
+import lombok.extern.java.Log;
 
+@Log
 public class SyncService {
 	final Map<String, SyncArea<?>> areas = new ConcurrentHashMap<>();
 	final SessionMap sessions = new SessionMap();
@@ -27,11 +30,11 @@ public class SyncService {
 	}
 
 	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId) {
-
-		final SyncServiceUser user = this.users.computeIfAbsent(userId,
-				id -> new SyncServiceUser(userId, newUserToken(userId)));
+		final SyncServiceUser user = this.users.computeIfAbsent(userId, id -> new SyncServiceUser(userId));
 		final SyncServiceSession session = newSession(user, externalSessionId);
 		this.sessions.add(session);
+		log.log(Level.SEVERE, "user " + userId + " connected with sessionToken=" + session.sessionToken
+				+ " and external sessionId=" + session.externalSessionId);
 		return session.init();
 	}
 
@@ -90,10 +93,6 @@ public class SyncService {
 	}
 
 	protected String newSessionToken(final SyncServiceUser user) {
-		return UUID.randomUUID().toString();
-	}
-
-	protected String newUserToken(final String userId) {
 		return UUID.randomUUID().toString();
 	}
 

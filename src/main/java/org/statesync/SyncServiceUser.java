@@ -10,7 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class SyncServiceUser {
 	public final String userId;
-	public final String userToken;
 	public final Map<String, SyncServiceSession> sessions = new ConcurrentHashMap<>();
 
 	public void accept(final SyncServiceVisitor visitor) {
