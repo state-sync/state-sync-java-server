@@ -150,10 +150,23 @@ public class SyncArea<Model> {
 	}
 
 	public void patchArea(final SyncServiceSession session, final PatchAreaRequest event) {
+		final String sessionToken = session.sessionToken;
+		if (!checkPermissions(session.user.userId)) {
+			this.service.protocol.sendSubscribeAreaFail(sessionToken, event.id, this.areaId,
+														AreaSubscriptionError.accessDenied);
+			return;
+		}
+        log.info("Trace: patch: " +session.sessionToken + ", " + session.user.userId+" dbg=" + this.users.size());
 		this.users.get(session.user.userId).patch(session.sessionToken, event);
 	}
 
 	public void signal(final SyncServiceSession session, final SignalRequest event) {
+		final String sessionToken = session.sessionToken;
+		if (!checkPermissions(session.user.userId)) {
+			this.service.protocol.sendSubscribeAreaFail(sessionToken, event.id, this.areaId,
+														AreaSubscriptionError.accessDenied);
+			return;
+		}
 		this.users.get(session.user.userId).signal(session.sessionToken, event);
 	}
 
@@ -178,6 +191,7 @@ public class SyncArea<Model> {
 				id -> new SyncAreaUser<>(session.user, this));
 		final SyncAreaSession<Model> areaSession = new SyncAreaSession<Model>(session, areaUser);
 
+		log.info("Trace: subscribe: " +session.sessionToken + ", " + session.user.userId+" dbg=" + this.users.size());
 		areaSession.subscribe(event);
 	}
 
