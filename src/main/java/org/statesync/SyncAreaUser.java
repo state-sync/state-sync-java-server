@@ -49,6 +49,10 @@ public class SyncAreaUser<Model> {
 		return this.area.getClientConfig(this);
 	}
 
+	public String getUserId() {
+		return this.user.userId;
+	}
+
 	public Model load() {
 		final String userId = this.user.userId;
 		synchronized (this.userLock) {
@@ -76,8 +80,8 @@ public class SyncAreaUser<Model> {
 		this.protocol.confirmPatch(sessionToken, event);
 	}
 
-	public boolean remove(final SyncServiceSession session) {
-		this.sessions.remove(session.sessionToken);
+	public boolean removeSession(final String sessionToken) {
+		this.sessions.remove(sessionToken);
 		return this.sessions.isEmpty();
 	}
 

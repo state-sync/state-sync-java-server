@@ -153,6 +153,12 @@ public class SyncArea<Model> {
 		this.users.get(session.user.userId).patch(session.sessionToken, event);
 	}
 
+	public void removeSession(final String sessionToken) {
+		final SyncAreaSession<Model> session = this.sessions.remove(sessionToken);
+		this.users.computeIfPresent(session.user.getUserId(),
+				(id, user) -> user.removeSession(sessionToken) ? null : user);
+	}
+
 	public void signal(final SyncServiceSession session, final SignalRequest event) {
 		this.users.get(session.user.userId).signal(session.sessionToken, event);
 	}
@@ -198,9 +204,7 @@ public class SyncArea<Model> {
 	public void unsubscribeSession(final SyncServiceSession session, final UnsubscribeAreaRequest event) {
 
 		// unlink
-		this.sessions.remove(session.sessionToken);
-		this.users.computeIfPresent(session.user.userId, (id, user) -> user.remove(session) ? null : user);
-
+		removeSession(session.sessionToken);
 		// response
 		final UnsubscribeAreaResponse response = new UnsubscribeAreaResponse(event.id, this.areaId);
 		this.service.protocol.send(session.sessionToken, response);

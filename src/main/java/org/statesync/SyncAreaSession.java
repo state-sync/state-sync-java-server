@@ -22,7 +22,7 @@ public class SyncAreaSession<Model> {
 
 	private SyncOutbound protocol;
 
-	private SyncAreaUser<Model> user;
+	SyncAreaUser<Model> user;
 
 	private JsonFilter jsonFilter;
 

@@ -20,12 +20,8 @@ public class SyncServiceUser {
 		this.sessions.put(session.sessionToken, session);
 	}
 
-	public boolean onSessionDisconnect(final SyncServiceSession session) {
-		this.sessions.remove(session.sessionToken);
-		return this.sessions.isEmpty();
-	}
-
-	public void removeSession(final String sessionToken) {
+	public boolean removeSession(final String sessionToken) {
 		this.sessions.remove(sessionToken);
+		return this.sessions.isEmpty();
 	}
 }
