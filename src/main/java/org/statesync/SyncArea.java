@@ -198,7 +198,7 @@ public class SyncArea<Model> {
 		final SyncAreaUser<Model> areaUser = this.users.computeIfAbsent(session.user.userId,
 				id -> new SyncAreaUser<>(session.user, this));
 		final SyncAreaSession<Model> areaSession = new SyncAreaSession<Model>(session, areaUser);
-
+		this.sessions.put(session.sessionToken, areaSession);
 		log.info(
 				"Trace: subscribe: " + session.sessionToken + ", " + session.user.userId + " dbg=" + this.users.size());
 		areaSession.subscribe(event);
