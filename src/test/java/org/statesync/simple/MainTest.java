@@ -31,7 +31,7 @@ public class MainTest {
 		final TestSyncService service = new TestSyncService(protocol);
 		final TestArea area = new TestArea();
 		service.register(area);
-		final String sessionToken = service.connect("userA", "1").sessionToken;
+		final String sessionToken = service.connect("userA", "1", "2").sessionToken;
 		service.handle(sessionToken, new SubscribeAreaRequest(cid++, "test"));
 
 		Assert.assertEquals(1, service.getSessionsCount());

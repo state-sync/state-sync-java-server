@@ -1,7 +1,6 @@
 package org.statesync;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -29,9 +28,10 @@ public class SyncService {
 		visitor.visit(this);
 	}
 
-	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId) {
+	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId,
+			final String sessionToken) {
 		final SyncServiceUser user = this.users.computeIfAbsent(userId, id -> new SyncServiceUser(userId));
-		final SyncServiceSession session = newSession(user, externalSessionId);
+		final SyncServiceSession session = newSession(user, externalSessionId, sessionToken);
 		this.sessions.add(session);
 		log.log(Level.SEVERE, "user " + userId + " connected with sessionToken=" + session.sessionToken
 				+ " and external sessionId=" + session.externalSessionId);
@@ -90,13 +90,14 @@ public class SyncService {
 		session.handle(event);
 	}
 
-	protected SyncServiceSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId) {
-		return new SyncServiceSession(this, user, newSessionToken(user), externalSessionId);
+	protected SyncServiceSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId,
+			final String sessionToken) {
+		return new SyncServiceSession(this, user, sessionToken, externalSessionId);
 	}
-
-	protected String newSessionToken(final SyncServiceUser user) {
-		return UUID.randomUUID().toString();
-	}
+	//
+	// protected String newSessionToken(final SyncServiceUser user) {
+	// return UUID.randomUUID().toString();
+	// }
 
 	public void register(final SyncArea<?> area) {
 		if (this.areas.containsKey(area.getAreaId())) {
