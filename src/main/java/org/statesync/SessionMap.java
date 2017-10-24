@@ -71,10 +71,9 @@ public class SessionMap {
 	 */
 	public synchronized SyncServiceSession removeByExternalSessionId(final String externalSessionId) {
 		final SyncServiceSession session = this.byExternalSessionId.remove(externalSessionId);
-		if (session == null)
-			throw new SyncException("Unknown session for external session id:" + externalSessionId);
-
-		this.byToken.remove(session.sessionToken);
+		if (session != null) {
+			this.byToken.remove(session.sessionToken);
+		}
 		return session;
 	}
 
