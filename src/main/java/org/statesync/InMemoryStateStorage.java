@@ -15,11 +15,6 @@ public class InMemoryStateStorage implements StateStorage {
 	}
 
 	@Override
-	public void remove(final String key) {
-		this.models.remove(key);
-	}
-
-	@Override
 	public void save(final String key, final ObjectNode json) {
 		this.models.put(key, json);
 	}

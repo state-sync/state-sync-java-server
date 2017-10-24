@@ -68,7 +68,7 @@ public class SyncAreaSession<Model> {
 	}
 
 	public void onRemove() {
-		this.sessionStorage.remove(this.session.sessionToken);
+		// this.sessionStorage.remove(this.session.sessionToken);
 	}
 
 	public void patch(final PatchAreaRequest event) {

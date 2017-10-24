@@ -40,9 +40,11 @@ public class SyncService {
 
 	public void disconnectSession(final String externalSessionId) {
 		final SyncServiceSession session = this.sessions.removeByExternalSessionId(externalSessionId);
-		final String sessionToken = session.sessionToken;
-		this.users.entrySet().removeIf(entry -> entry.getValue().removeSession(sessionToken));
-		this.areas.values().forEach(area -> area.removeSession(sessionToken));
+		if (session != null) {
+			final String sessionToken = session.sessionToken;
+			this.users.entrySet().removeIf(entry -> entry.getValue().removeSession(sessionToken));
+			this.areas.values().forEach(area -> area.removeSession(sessionToken));
+		}
 	}
 
 	public void disconnectUser(final String userId) {

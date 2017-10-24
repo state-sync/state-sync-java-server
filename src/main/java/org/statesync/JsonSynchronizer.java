@@ -1,7 +1,6 @@
 package org.statesync;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,7 +18,8 @@ public class JsonSynchronizer<T> {
 		// Redux and NgRx would like to have null value of property instead of
 		// absent property
 		this.mapper.setSerializationInclusion(Include.ALWAYS);
-		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		// this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+		// false);
 	}
 
 	public void accept(final SyncServiceVisitor visitor) {
@@ -35,7 +35,7 @@ public class JsonSynchronizer<T> {
 	}
 
 	public ObjectNode json(final T model) {
-		return this.mapper.valueToTree(model);
+		return this.mapper.convertValue(model, ObjectNode.class);
 	}
 
 	public T model(final ObjectNode model) {

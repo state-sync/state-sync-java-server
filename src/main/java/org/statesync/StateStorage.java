@@ -19,15 +19,8 @@ public interface StateStorage {
 	ObjectNode load(String key);
 
 	/**
-	 * Removes model by key
-	 *
-	 * @param key
-	 */
-	void remove(String key);
-
-	/**
 	 * Stores model by key
-	 * 
+	 *
 	 * @param key
 	 *            - model key
 	 * @param json
