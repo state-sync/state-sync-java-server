@@ -39,7 +39,11 @@ public class JsonSynchronizer<T> {
 	}
 
 	public T model(final ObjectNode model) {
-		return this.mapper.convertValue(model, this.clazz);
+		try {
+			return this.mapper.convertValue(model, this.clazz);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public ObjectNode patch(final ObjectNode json, final ArrayNode patch) {
