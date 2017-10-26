@@ -37,6 +37,21 @@
 			<version>2.9.1</version>
 		</dependency>
 		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-parameter-names</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jdk8</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-patch</artifactId>
 			<version>1.9</version>

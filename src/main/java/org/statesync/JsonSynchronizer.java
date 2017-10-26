@@ -15,6 +15,7 @@ public class JsonSynchronizer<T> {
 	public JsonSynchronizer(final Class<T> clazz) {
 		this.clazz = clazz;
 		this.mapper = new ObjectMapper();
+		this.mapper.findAndRegisterModules();
 		// Redux and NgRx would like to have null value of property instead of
 		// absent property
 		this.mapper.setSerializationInclusion(Include.ALWAYS);
