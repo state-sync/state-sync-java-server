@@ -1,6 +1,8 @@
 package org.statesync;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -16,6 +18,8 @@ import lombok.extern.java.Log;
 @Log
 public class SyncAreaUser<Model> {
 	public final Map<String, SyncAreaSession<Model>> sessions = new ConcurrentHashMap<>();
+
+	private final Set<Dependency> dependencies = new HashSet<>();
 
 	private StateStorage userStorage;
 
@@ -58,6 +62,7 @@ public class SyncAreaUser<Model> {
 		synchronized (this.userLock) {
 			final ObjectNode json = this.userStorage.load(userId);
 			if (json == null) {
+				this.cleanDependencies();
 				final Model original = this.processor.reduce(this.area.factory.get(), this);
 				final ObjectNode updatedJson = this.synchronizer.json(original);
 				this.userStorage.save(this.user.userId, updatedJson);
@@ -113,6 +118,7 @@ public class SyncAreaUser<Model> {
 					// updated = this.processor.process(updated, this);
 					updated = enchancer.reduce(updated, this);
 				}
+				this.cleanDependencies();
 				updated = this.processor.reduce(updated, this);
 
 				// save if required
@@ -126,5 +132,34 @@ public class SyncAreaUser<Model> {
 				log.log(Level.SEVERE, "sync failed", e);
 			}
 		}
+	}
+
+	public void cleanDependencies() {
+		this.dependencies.clear();
+
+	}
+
+	public void listen(final Dependency... dependency) {
+		for (final Dependency d : dependency) {
+			this.dependencies.add(d);
+		}
+	}
+
+	public void listenForUser(final Dependency... dependency) {
+		for (final Dependency d : dependency) {
+			this.dependencies.add(d.child(getUserId()));
+		}
+	}
+
+	public void fire(final Dependency dependency) {
+		this.area.fireChanges(dependency, this);
+	}
+
+	public boolean hasDependency(final Dependency dependency) {
+		return this.dependencies.contains(dependency);
+	}
+
+	public void fireForUser(final Dependency dependency) {
+		fire(dependency.child(this.getUserId()));
 	}
 }

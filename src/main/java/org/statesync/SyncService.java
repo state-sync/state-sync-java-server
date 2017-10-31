@@ -112,4 +112,8 @@ public class SyncService {
 	public void unregister(final String areaId) {
 		this.areas.remove(areaId).unregister();
 	}
+
+	public void fireLocalChanges(final Dependency dependency, final SyncAreaUser<?> user) {
+		this.areas.values().forEach(area -> area.handleLocalChanges(dependency, user));
+	}
 }

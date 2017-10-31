@@ -226,4 +226,17 @@ public class SyncArea<Model> {
 		final UnsubscribeAreaResponse response = new UnsubscribeAreaResponse(event.id, this.areaId);
 		this.service.protocol.send(session.sessionToken, response);
 	}
+
+	public void fireChanges(final Dependency dependency, final SyncAreaUser<Model> syncAreaUser) {
+		this.service.fireLocalChanges(dependency, syncAreaUser);
+	}
+
+	public void handleLocalChanges(final Dependency dependency, final SyncAreaUser<?> user) {
+		final SyncAreaUser<Model> u = this.users.get(user.getUserId());
+		if (u != user) {
+			if (u.hasDependency(dependency)) {
+				u.sync(null);
+			}
+		}
+	}
 }
