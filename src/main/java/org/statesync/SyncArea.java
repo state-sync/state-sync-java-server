@@ -233,7 +233,7 @@ public class SyncArea<Model> {
 
 	public void handleLocalChanges(final Dependency dependency, final SyncAreaUser<?> user) {
 		final SyncAreaUser<Model> u = this.users.get(user.getUserId());
-		if (u != user) {
+		if (u != null && u != user) {
 			if (u.hasDependency(dependency)) {
 				u.sync(null);
 			}
