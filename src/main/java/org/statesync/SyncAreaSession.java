@@ -77,10 +77,10 @@ public class SyncAreaSession<Model> {
 		this.sessionStorage.save(this.session.sessionToken, this.synchronizer.json(model));
 	}
 
-	public void subscribe(final SubscribeAreaRequest event) {
+	public void subscribe(final SubscribeAreaRequest event, final boolean updateModel) {
 		final String sessionToken = this.session.sessionToken;
 		// load user model
-		final Model model = this.user.load();
+		final Model model = this.user.load(updateModel);
 		// Store model into session storage
 		ObjectNode json = this.synchronizer.json(model);
 		this.sessionStorage.save(sessionToken, json);

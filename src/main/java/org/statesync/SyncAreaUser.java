@@ -57,19 +57,29 @@ public class SyncAreaUser<Model> {
 		return this.user.userId;
 	}
 
-	public Model load() {
+	public Model load(final boolean forceReduce) {
 		final String userId = this.user.userId;
 		synchronized (this.userLock) {
 			final ObjectNode json = this.userStorage.load(userId);
-			if (json == null) {
+			if (json == null || forceReduce) {
 				this.cleanDependencies();
-				final Model original = this.processor.reduce(this.area.factory.get(), this);
+				final Model model = resolveModel(json);
+				final Model original = this.processor.reduce(model, this);
 				final ObjectNode updatedJson = this.synchronizer.json(original);
 				this.userStorage.save(this.user.userId, updatedJson);
 				return original;
 			} else {
 				return this.synchronizer.model(json);
 			}
+		}
+	}
+
+	private Model resolveModel(final ObjectNode json) {
+		try {
+			return json == null ? this.area.factory.get() : this.synchronizer.model(json);
+		} catch (final Exception e) {
+			// incompatible model stored in json, build brand new
+			return this.area.factory.get();
 		}
 	}
 
@@ -110,7 +120,7 @@ public class SyncAreaUser<Model> {
 		synchronized (this.userLock) {
 			try {
 				// load model
-				final Model original = load();
+				final Model original = load(false);
 				Model updated = this.synchronizer.clone(original);
 
 				// apply client patch
