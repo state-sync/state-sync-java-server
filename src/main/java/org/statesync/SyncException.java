@@ -11,4 +11,8 @@ public class SyncException extends RuntimeException {
 		super(message);
 	}
 
+	public SyncException(final Exception e) {
+		super(e);
+	}
+
 }

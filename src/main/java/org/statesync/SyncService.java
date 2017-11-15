@@ -89,7 +89,11 @@ public class SyncService {
 		if (session == null) {
 			throw new SyncException("Unknown sessionToken:" + sessionToken);
 		}
-		session.handle(event);
+		try {
+			session.handle(event);
+		} catch (final Exception e) {
+			throw new SyncException(e);
+		}
 	}
 
 	protected SyncServiceSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId,
