@@ -157,7 +157,9 @@ public class SyncArea<Model> {
 			return;
 		}
 		log.info("Trace: patch: " + session.sessionToken + ", " + session.user.userId + " dbg=" + this.users.size());
-		this.users.get(session.user.userId).patch(session.sessionToken, event);
+		final SyncAreaUser<Model> syncAreaUser = this.users.computeIfAbsent(session.user.userId,
+				k -> new SyncAreaUser<>(session.user, this));
+		syncAreaUser.patch(session.sessionToken, event);
 	}
 
 	public void removeSession(final String sessionToken) {
