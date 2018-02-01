@@ -90,7 +90,11 @@ public class SyncAreaUser<Model> {
 	}
 
 	public void patch(final String sessionToken, final PatchAreaRequest event) {
-		this.sessions.get(sessionToken).patch(event);
+		final SyncAreaSession<Model> session = this.sessions.get(sessionToken);
+		if (session == null) {
+			throw new RuntimeException();
+		}
+		session.patch(event);
 		patch(event.patch);
 		this.protocol.confirmPatch(sessionToken, event);
 	}
