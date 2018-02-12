@@ -92,6 +92,7 @@ public class SyncService {
 		try {
 			session.handle(event);
 		} catch (final Exception e) {
+			log.log(Level.SEVERE, "error", e);
 			throw new SyncException(e);
 		}
 	}
