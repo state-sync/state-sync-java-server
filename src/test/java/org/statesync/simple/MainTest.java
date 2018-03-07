@@ -35,8 +35,6 @@ public class MainTest {
 		service.handle(sessionToken, new SubscribeAreaRequest(cid++, "test"));
 
 		Assert.assertEquals(1, service.getSessionsCount());
-		Assert.assertEquals(1, service.getUserSubscriptionsCount());
-		Assert.assertEquals(1, service.getSessionSubscriptionsCount());
 
 		// check server patch
 		service.handle(sessionToken, new PatchAreaRequest(cid, "test", replacePatch("/name", "a")));
@@ -45,8 +43,6 @@ public class MainTest {
 		service.handle(sessionToken, new UnsubscribeAreaRequest(cid, "test"));
 
 		Assert.assertEquals(1, service.getSessionsCount());
-		Assert.assertEquals(0, service.getUserSubscriptionsCount());
-		Assert.assertEquals(0, service.getSessionSubscriptionsCount());
 		service.unregister("test");
 	}
 }

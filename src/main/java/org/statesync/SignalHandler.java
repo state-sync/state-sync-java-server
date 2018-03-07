@@ -26,6 +26,6 @@ public interface SignalHandler<Model> {
 	 *            - signal parameters
 	 * @return updated model
 	 */
-	Model handle(Model model, SyncAreaUser<Model> user, String signal, ObjectNode parameters);
+	Model handle(Model model, SyncAreaApi<Model> user, String signal, ObjectNode parameters);
 
 }

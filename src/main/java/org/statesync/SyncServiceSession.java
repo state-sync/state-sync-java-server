@@ -12,22 +12,14 @@ public class SyncServiceSession {
 	public final String sessionToken;
 	public SyncService service;
 	public String externalSessionId;
-	public final SyncServiceUser user;
+	public String userId;
 
-	public SyncServiceSession(final SyncService service, final SyncServiceUser user, final String sessionToken,
+	public SyncServiceSession(final SyncService service, final String userId, final String sessionToken,
 			final String externalSessionId) {
 		this.service = service;
-		this.user = user;
+		this.userId = userId;
 		this.sessionToken = sessionToken;
 		this.externalSessionId = externalSessionId;
-	}
-
-	public void accept(final SyncServiceVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	public boolean disconnectUser(final String userId) {
-		return this.user.userId.equals(userId);
 	}
 
 	public SyncSessionInfo getInfo() {

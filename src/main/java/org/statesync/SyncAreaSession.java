@@ -2,11 +2,7 @@ package org.statesync;
 
 import java.util.logging.Level;
 
-import org.statesync.config.ClientAreaConfig;
 import org.statesync.protocol.EventMessage;
-import org.statesync.protocol.patch.PatchAreaRequest;
-import org.statesync.protocol.subscription.SubscribeAreaRequest;
-import org.statesync.protocol.subscription.SubscribeAreaResponse;
 import org.statesync.protocol.sync.PatchAreaEvent;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -27,25 +23,9 @@ public class SyncAreaSession<Model> {
 
 	private SyncOutbound protocol;
 
-	SyncAreaUser<Model> user;
+	SyncAreaApi<Model> user;
 
 	private JsonFilter jsonFilter;
-
-	public SyncAreaSession(final SyncServiceSession session, final SyncAreaUser<Model> user) {
-		super();
-		this.session = session;
-		this.user = user;
-		this.jsonFilter = user.area.jsonFilter;
-		this.areaId = user.area.getAreaId();
-		this.protocol = user.area.service.protocol;
-		this.synchronizer = user.area.synchronizer;
-		this.sessionStorage = user.area.sessionStorage;
-		user.sessions.put(session.sessionToken, this);
-	}
-
-	public void accept(final SyncServiceVisitor visitor) {
-		visitor.visit(this);
-	}
 
 	public void onChange(final Model updated) {
 		try {
@@ -65,30 +45,5 @@ public class SyncAreaSession<Model> {
 		} catch (final Exception e) {
 			log.log(Level.SEVERE, "Session was not completed correctly", e);
 		}
-	}
-
-	public void onRemove() {
-		// this.sessionStorage.remove(this.session.sessionToken);
-	}
-
-	public void patch(final PatchAreaRequest event) {
-		final ObjectNode json = this.sessionStorage.load(this.session.sessionToken);
-		final Model model = this.synchronizer.patch(this.synchronizer.model(json), event.patch);
-		this.sessionStorage.save(this.session.sessionToken, this.synchronizer.json(model));
-	}
-
-	public void subscribe(final SubscribeAreaRequest event, final boolean updateModel) {
-		final String sessionToken = this.session.sessionToken;
-		// load user model
-		final Model model = this.user.load(updateModel);
-		// Store model into session storage
-		ObjectNode json = this.synchronizer.json(model);
-		this.sessionStorage.save(sessionToken, json);
-		json = this.jsonFilter.filterModel(json);
-
-		// response
-		final ClientAreaConfig clientConfig = this.user.getClientConfig();
-		final SubscribeAreaResponse response = new SubscribeAreaResponse(event.id, this.areaId, clientConfig, json);
-		this.protocol.send(sessionToken, response);
 	}
 }

@@ -23,15 +23,6 @@ public class SessionMap {
 	private final Map<String, SyncServiceSession> byExternalSessionId = new ConcurrentHashMap<>();
 
 	/**
-	 * Accept visitor
-	 *
-	 * @param visitor
-	 */
-	public void accept(final SyncServiceVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	/**
 	 * Add session and store in by two keys
 	 *
 	 * @param session
@@ -87,7 +78,7 @@ public class SessionMap {
 			final SyncServiceSession session = entry.getValue();
 			if (session == null)
 				throw new SyncException("Unknown session for user:" + userId);
-			if (session.disconnectUser(userId)) {
+			if (session.userId.equals(userId)) {
 				this.byExternalSessionId.remove(session.externalSessionId);
 				return true;
 			} else {

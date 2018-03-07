@@ -19,5 +19,5 @@ public interface StateReducer<Model> {
 	 *            - user of sync ares
 	 * @return changed model
 	 */
-	Model reduce(Model model, SyncAreaUser<Model> user);
+	Model reduce(Model model, SyncAreaApi<Model> user);
 }

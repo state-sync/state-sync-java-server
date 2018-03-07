@@ -3,9 +3,7 @@ package org.statesync;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-import org.statesync.info.StateSyncInfo;
 import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 
@@ -16,7 +14,6 @@ import lombok.extern.java.Log;
 public class SyncService {
 	final Map<String, SyncArea<?>> areas = new ConcurrentHashMap<>();
 	final SessionMap sessions = new SessionMap();
-	final Map<String, SyncServiceUser> users = new ConcurrentHashMap<>();
 
 	SyncOutbound protocol;
 
@@ -24,14 +21,10 @@ public class SyncService {
 		this.protocol = protocol;
 	}
 
-	public void accept(final SyncServiceVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId,
 			final String sessionToken) {
-		final SyncServiceUser user = this.users.computeIfAbsent(userId, id -> new SyncServiceUser(userId));
-		final SyncServiceSession session = newSession(user, externalSessionId, sessionToken);
+
+		final SyncServiceSession session = new SyncServiceSession(this, userId, sessionToken, externalSessionId);
 		this.sessions.add(session);
 		log.log(Level.SEVERE, "user " + userId + " connected with sessionToken=" + session.sessionToken
 				+ " and external sessionId=" + session.externalSessionId);
@@ -39,16 +32,10 @@ public class SyncService {
 	}
 
 	public void disconnectSession(final String externalSessionId) {
-		final SyncServiceSession session = this.sessions.removeByExternalSessionId(externalSessionId);
-		if (session != null) {
-			final String sessionToken = session.sessionToken;
-			this.users.entrySet().removeIf(entry -> entry.getValue().removeSession(sessionToken));
-			this.areas.values().forEach(area -> area.removeSession(sessionToken));
-		}
+		this.sessions.removeByExternalSessionId(externalSessionId);
 	}
 
 	public void disconnectUser(final String userId) {
-		this.users.remove(userId);
 		this.sessions.removeByUserId(userId);
 	}
 
@@ -64,24 +51,8 @@ public class SyncService {
 		return this.areas.size();
 	}
 
-	public StateSyncInfo getInfo() {
-		final StateSyncInfoBuilder visitor = new StateSyncInfoBuilder();
-		accept(visitor);
-		return visitor.model;
-	}
-
 	public int getSessionsCount() {
 		return this.sessions.size();
-	}
-
-	public long getSessionSubscriptionsCount() {
-		return this.areas.values().stream().map(area -> area.getSessionsCount())
-				.collect(Collectors.summarizingInt(i -> i)).getSum();
-	}
-
-	public long getUserSubscriptionsCount() {
-		return this.areas.values().stream().map(area -> area.getUsersCount()).collect(Collectors.summarizingInt(i -> i))
-				.getSum();
 	}
 
 	public void handle(@NonNull final String sessionToken, final RequestMessage event) {
@@ -97,10 +68,6 @@ public class SyncService {
 		}
 	}
 
-	protected SyncServiceSession newSession(@NonNull final SyncServiceUser user, final String externalSessionId,
-			final String sessionToken) {
-		return new SyncServiceSession(this, user, sessionToken, externalSessionId);
-	}
 	//
 	// protected String newSessionToken(final SyncServiceUser user) {
 	// return UUID.randomUUID().toString();
@@ -118,7 +85,7 @@ public class SyncService {
 		this.areas.remove(areaId).unregister();
 	}
 
-	public void fireLocalChanges(final Dependency dependency, final SyncAreaUser<?> user) {
+	public void fireLocalChanges(final Dependency dependency, final SyncAreaApi<?> user) {
 		this.areas.values().forEach(area -> area.handleLocalChanges(dependency, user));
 	}
 }

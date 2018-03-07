@@ -23,8 +23,12 @@ public class JsonSynchronizer<T> {
 		// false);
 	}
 
-	public void accept(final SyncServiceVisitor visitor) {
-		visitor.visit(this);
+	public T newModel() {
+		try {
+			return this.clazz.newInstance();
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public T clone(final T model) {
@@ -33,6 +37,10 @@ public class JsonSynchronizer<T> {
 
 	public ArrayNode diff(final T original, final T updated) {
 		return (ArrayNode) JsonDiff.asJson(json(original), json(updated));
+	}
+
+	public ArrayNode diff(final ObjectNode original, final ObjectNode updated) {
+		return (ArrayNode) JsonDiff.asJson(original, updated);
 	}
 
 	public ObjectNode json(final T model) {
