@@ -9,7 +9,6 @@ import org.statesync.protocol.subscription.SubscribeAreaRequest;
 import org.statesync.protocol.subscription.SubscribeAreaResponse;
 import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 import org.statesync.protocol.subscription.UnsubscribeAreaResponse;
-import org.statesync.protocol.sync.PatchAreaEvent;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -132,10 +131,13 @@ public class SyncArea<Model> {
 		final Model patchedModel = this.synchronizer.model(patchedJson);
 		final Model reducedModel = this.reducer.reduce(patchedModel, api);
 		final ObjectNode reducedJson = this.synchronizer.json(reducedModel);
-		final ArrayNode diff = this.synchronizer.diff(patchedJson, reducedJson);
+		ArrayNode diff = this.synchronizer.diff(patchedJson, reducedJson);
 		this.storage.save(session.sessionToken, reducedJson);
-		final PatchAreaEvent patch = new PatchAreaEvent(this.areaId, diff);
-		this.service.protocol.send(sessionToken, patch);
+		// we must filter out server parts before sync.
+		diff = this.jsonFilter.filterPatch(diff);
+		if (diff.size() > 0) {
+			this.service.protocol.sendPatch(sessionToken, this.areaId, diff);
+		}
 		this.service.protocol.confirmPatch(sessionToken, event);
 	}
 
@@ -159,8 +161,7 @@ public class SyncArea<Model> {
 		final ObjectNode reducedJson = this.synchronizer.json(model);
 		final ArrayNode diff = this.synchronizer.diff(initialJson, reducedJson);
 		this.storage.save(session.sessionToken, reducedJson);
-		final PatchAreaEvent patch = new PatchAreaEvent(this.areaId, diff);
-		this.service.protocol.send(sessionToken, patch);
+		this.service.protocol.sendPatch(sessionToken, this.areaId, diff);
 		this.service.protocol.confirmSignal(sessionToken, event);
 	}
 
