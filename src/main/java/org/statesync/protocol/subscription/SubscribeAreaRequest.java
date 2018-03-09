@@ -11,10 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class SubscribeAreaRequest extends RequestMessage {
-	public String area;
-
 	public SubscribeAreaRequest(final int id, final String area) {
-		super(id, RequestType.subscribeArea);
-		this.area = area;
+		super(id, RequestType.subscribeArea, area);
 	}
 }

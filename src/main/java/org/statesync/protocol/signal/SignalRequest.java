@@ -13,13 +13,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class SignalRequest extends RequestMessage {
-	public String area;
 	public String signal;
 	public ObjectNode parameters;
 
 	public SignalRequest(final int id, final String area, final String signal, final ObjectNode parameters) {
-		super(id, RequestType.signal);
-		this.area = area;
+		super(id, RequestType.signal, area);
 		this.signal = signal;
 		this.parameters = parameters;
 	}

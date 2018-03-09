@@ -13,12 +13,10 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PatchAreaRequest extends RequestMessage {
-	public String area;
 	public ArrayNode patch;
 
 	public PatchAreaRequest(final int id, final String area, final ArrayNode patch) {
-		super(id, RequestType.p);
-		this.area = area;
+		super(id, RequestType.p, area);
 		this.patch = patch;
 	}
 }

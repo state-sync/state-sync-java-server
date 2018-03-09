@@ -1,6 +1,10 @@
 package org.statesync;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.statesync.info.SyncSessionInfo;
+import org.statesync.protocol.MessageQueue;
 import org.statesync.protocol.RequestMessage;
 import org.statesync.protocol.init.InitSessionResponse;
 import org.statesync.protocol.patch.PatchAreaRequest;
@@ -13,13 +17,16 @@ public class SyncServiceSession {
 	public SyncService service;
 	public String externalSessionId;
 	public String userId;
+	private final Map<String, MessageQueue> queues = new ConcurrentHashMap<>();
+	private Executor executor;
 
 	public SyncServiceSession(final SyncService service, final String userId, final String sessionToken,
-			final String externalSessionId) {
+			final String externalSessionId, final Executor executor) {
 		this.service = service;
 		this.userId = userId;
 		this.sessionToken = sessionToken;
 		this.externalSessionId = externalSessionId;
+		this.executor = executor;
 	}
 
 	public SyncSessionInfo getInfo() {
@@ -27,21 +34,34 @@ public class SyncServiceSession {
 	}
 
 	public void handle(final RequestMessage event) {
-		switch (event.getType()) {
-			case subscribeArea:
-				subscribeArea((SubscribeAreaRequest) event);
-				return;
-			case unsubscribeArea:
-				unsubscribeArea((UnsubscribeAreaRequest) event);
-				return;
-			case signal:
-				signal((SignalRequest) event);
-				return;
-			case p:
-			default:
-				patchArea((PatchAreaRequest) event);
-				return;
+		// put event into queue
+		final MessageQueue queue = this.queues.computeIfAbsent(event.area, (id) -> new MessageQueue(1));
+		queue.put(event);
+		// handle events in proper order, same thread handle events for same
+		// session
+		for (RequestMessage ready = queue.get(); ready != null; ready = queue.get()) {
+			handleInternal(ready);
 		}
+	}
+
+	private void handleInternal(final RequestMessage ready) {
+		this.executor.execute(this.sessionToken, () -> {
+			switch (ready.getType()) {
+				case subscribeArea:
+					subscribeArea((SubscribeAreaRequest) ready);
+					return;
+				case unsubscribeArea:
+					unsubscribeArea((UnsubscribeAreaRequest) ready);
+					return;
+				case signal:
+					signal((SignalRequest) ready);
+					return;
+				case p:
+				default:
+					patchArea((PatchAreaRequest) ready);
+					return;
+			}
+		});
 	}
 
 	public InitSessionResponse init() {

@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public abstract class RequestMessage extends Message {
 	public int id;
 	public RequestType type;
+	public String area;
 }

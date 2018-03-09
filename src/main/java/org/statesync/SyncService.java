@@ -16,15 +16,18 @@ public class SyncService {
 	final SessionMap sessions = new SessionMap();
 
 	SyncOutbound protocol;
+	private Executor executor;
 
-	public SyncService(final @NonNull SyncOutbound protocol) {
+	public SyncService(final @NonNull SyncOutbound protocol, final int threadsCount) {
 		this.protocol = protocol;
+		this.executor = new Executor(threadsCount);
 	}
 
 	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId,
 			final String sessionToken) {
 
-		final SyncServiceSession session = new SyncServiceSession(this, userId, sessionToken, externalSessionId);
+		final SyncServiceSession session = new SyncServiceSession(this, userId, sessionToken, externalSessionId,
+				this.executor);
 		this.sessions.add(session);
 		log.log(Level.SEVERE, "user " + userId + " connected with sessionToken=" + session.sessionToken
 				+ " and external sessionId=" + session.externalSessionId);
