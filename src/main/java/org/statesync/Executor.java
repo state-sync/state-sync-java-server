@@ -43,7 +43,7 @@ public class Executor {
 	}
 
 	public void execute(final String key, final Runnable task) {
-		final int idx = key.hashCode() % this.count;
+		final int idx = Math.abs(key.hashCode()) % this.count;
 		try {
 			this.queues[idx].put(task);
 		} catch (final InterruptedException e) {
