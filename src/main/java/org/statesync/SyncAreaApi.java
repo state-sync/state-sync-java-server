@@ -41,11 +41,19 @@ public class SyncAreaApi<Model> {
 		this.area.fireChanges(dependency, this);
 	}
 
+	public String getAccessToken() {
+		return this.session.sessionToken;
+	}
+
 	public boolean hasDependency(final Dependency dependency) {
 		return this.dependencies.contains(dependency);
 	}
 
 	public void fireForUser(final Dependency dependency) {
 		fire(dependency.child(this.getUserId()));
+	}
+
+	public void logout() {
+		this.session.logout();
 	}
 }

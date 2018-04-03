@@ -83,4 +83,8 @@ public class SyncServiceSession {
 	private void unsubscribeArea(final UnsubscribeAreaRequest event) {
 		this.service.findArea(event.area).unsubscribeSession(this, event);
 	}
+
+	public void logout() {
+		this.service.logout(this.userId);
+	}
 }

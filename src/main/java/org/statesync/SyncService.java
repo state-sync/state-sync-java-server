@@ -91,4 +91,8 @@ public class SyncService {
 	public void fireLocalChanges(final Dependency dependency, final SyncAreaApi<?> user) {
 		this.areas.values().forEach(area -> area.handleLocalChanges(dependency, user));
 	}
+
+	public void logout(final String userId) {
+		disconnectUser(userId);
+	}
 }
