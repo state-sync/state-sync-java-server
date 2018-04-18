@@ -2,6 +2,7 @@ package org.statesync;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import org.statesync.protocol.RequestMessage;
@@ -18,9 +19,10 @@ public class SyncService {
 	SyncOutbound protocol;
 	private Executor executor;
 
-	public SyncService(final @NonNull SyncOutbound protocol, final int threadsCount) {
+	public SyncService(final @NonNull SyncOutbound protocol,
+			final Supplier<ThreadContextInheritance> contextInheritance, final int threadsCount) {
 		this.protocol = protocol;
-		this.executor = new Executor(threadsCount);
+		this.executor = new Executor(contextInheritance, threadsCount);
 	}
 
 	public InitSessionResponse connect(@NonNull final String userId, final String externalSessionId,
