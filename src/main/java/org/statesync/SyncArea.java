@@ -123,7 +123,8 @@ public class SyncArea<Model> {
 					AreaSubscriptionError.accessDenied);
 			return;
 		}
-		log.info("Trace: patch: " + session.sessionToken + ", " + session.userId);
+		// log.info("Trace: patch: " + session.sessionToken + ", " +
+		// session.userId);
 		final SyncAreaApi<Model> api = new SyncAreaApi<>(session, this);
 
 		final ObjectNode initialJson = this.storage.load(session.sessionToken);
