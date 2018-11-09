@@ -5,17 +5,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class InMemoryStateStorage implements StateStorage {
+public class InMemoryStateStorage implements StateStorage
+{
 
 	private final Map<String, ObjectNode> models = new ConcurrentHashMap<>();
 
 	@Override
-	public ObjectNode load(final String key) {
+	public ObjectNode load(final String key)
+	{
 		return this.models.get(key);
 	}
 
 	@Override
-	public void save(final String key, final ObjectNode json) {
+	public void save(final String key, final ObjectNode json)
+	{
 		this.models.put(key, json);
 	}
 

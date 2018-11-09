@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author ify
  *
  */
-public interface StateStorage {
+public interface StateStorage
+{
 
 	/**
 	 * Loads model by key

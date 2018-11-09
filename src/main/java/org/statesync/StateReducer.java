@@ -9,7 +9,8 @@ package org.statesync;
  * @param <Model>
  */
 @FunctionalInterface
-public interface StateReducer<Model> {
+public interface StateReducer<Model>
+{
 	/**
 	 * Reduce model
 	 *

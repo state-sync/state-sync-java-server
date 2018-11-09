@@ -1,6 +1,7 @@
 package org.statesync.protocol.subscription;
 
-public enum AreaSubscriptionError {
+public enum AreaSubscriptionError
+{
 	/**
 	 * Area is unknown
 	 */

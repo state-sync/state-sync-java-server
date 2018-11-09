@@ -1,6 +1,7 @@
 package org.statesync.protocol;
 
-public enum EventType {
+public enum EventType
+{
 	/**
 	 * Patch area on client side
 	 */

@@ -1,6 +1,7 @@
 package org.statesync.protocol;
 
-public enum RequestType {
+public enum RequestType
+{
 	/**
 	 * Subscribe user session to specific area
 	 */

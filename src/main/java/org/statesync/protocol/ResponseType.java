@@ -1,6 +1,7 @@
 package org.statesync.protocol;
 
-public enum ResponseType {
+public enum ResponseType
+{
 	/**
 	 *
 	 */

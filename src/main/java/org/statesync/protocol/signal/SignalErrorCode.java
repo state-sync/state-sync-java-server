@@ -1,5 +1,6 @@
 package org.statesync.protocol.signal;
 
-public enum SignalErrorCode {
+public enum SignalErrorCode
+{
 	unknown
 }

@@ -11,13 +11,16 @@ import org.statesync.protocol.sync.PatchAreaEvent;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public interface SyncOutbound {
+public interface SyncOutbound
+{
 
-	default void confirmPatch(final String sessionToken, final PatchAreaRequest event) {
+	default void confirmPatch(final String sessionToken, final PatchAreaRequest event)
+	{
 		send(sessionToken, new PatchAreaResponse(event.id, event.area));
 	}
 
-	default void confirmSignal(final String sessionToken, final SignalRequest event) {
+	default void confirmSignal(final String sessionToken, final SignalRequest event)
+	{
 		send(sessionToken, new SignalResponse(event.id, event.area));
 	}
 
@@ -32,11 +35,13 @@ public interface SyncOutbound {
 	void send(final String sessionToken, final Message event);
 
 	default void sendSubscribeAreaFail(final String sessionToken, final int forId, final String areaId,
-			final AreaSubscriptionError error) {
+			final AreaSubscriptionError error)
+	{
 		send(sessionToken, new SubscribeAreaError(forId, areaId, error));
 	}
 
-	default void sendPatch(final String sessionToken, final String areaId, final ArrayNode diff) {
+	default void sendPatch(final String sessionToken, final String areaId, final ArrayNode diff)
+	{
 		final PatchAreaEvent patch = new PatchAreaEvent(areaId, diff);
 		this.send(sessionToken, patch);
 	}

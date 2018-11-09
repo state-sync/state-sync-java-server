@@ -8,12 +8,15 @@ import org.statesync.protocol.subscription.UnsubscribeAreaRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class RequestMessageFactory {
+public class RequestMessageFactory
+{
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public RequestMessage parse(final JsonNode json) {
+	public RequestMessage parse(final JsonNode json)
+	{
 		final RequestType type = RequestType.valueOf(json.get("type").asText());
-		switch (type) {
+		switch (type)
+		{
 			case subscribeArea:
 				return this.mapper.convertValue(json, SubscribeAreaRequest.class);
 			case unsubscribeArea:

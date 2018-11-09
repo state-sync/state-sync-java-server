@@ -11,7 +11,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @param <Model>
  */
 @FunctionalInterface
-public interface SignalHandler<Model> {
+public interface SignalHandler<Model>
+{
 
 	/**
 	 * Handle signal.

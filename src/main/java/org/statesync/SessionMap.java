@@ -12,7 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author ify
  *
  */
-public class SessionMap {
+public class SessionMap
+{
 	/**
 	 * Store session by token
 	 */
@@ -28,7 +29,8 @@ public class SessionMap {
 	 * @param session
 	 *            - session to store
 	 */
-	public void add(final SyncServiceSession session) {
+	public void add(final SyncServiceSession session)
+	{
 		this.byToken.put(session.sessionToken, session);
 		this.byExternalSessionId.put(session.externalSessionId, session);
 	}
@@ -39,7 +41,8 @@ public class SessionMap {
 	 * @param sessionToken
 	 * @return session or null
 	 */
-	public SyncServiceSession getByToken(final String sessionToken) {
+	public SyncServiceSession getByToken(final String sessionToken)
+	{
 		return this.byToken.get(sessionToken);
 	}
 
@@ -48,7 +51,8 @@ public class SessionMap {
 	 *
 	 * @return sessions
 	 */
-	public Collection<SyncServiceSession> getSessions() {
+	public Collection<SyncServiceSession> getSessions()
+	{
 		return this.byToken.values();
 	}
 
@@ -60,9 +64,11 @@ public class SessionMap {
 	 *             if sessionId is unknown
 	 * @return
 	 */
-	public synchronized SyncServiceSession removeByExternalSessionId(final String externalSessionId) {
+	public synchronized SyncServiceSession removeByExternalSessionId(final String externalSessionId)
+	{
 		final SyncServiceSession session = this.byExternalSessionId.remove(externalSessionId);
-		if (session != null) {
+		if (session != null)
+		{
 			this.byToken.remove(session.sessionToken);
 		}
 		return session;
@@ -73,15 +79,18 @@ public class SessionMap {
 	 *
 	 * @param userId
 	 */
-	public synchronized void removeByUserId(final String userId) {
+	public synchronized void removeByUserId(final String userId)
+	{
 		this.byToken.entrySet().removeIf(entry -> {
 			final SyncServiceSession session = entry.getValue();
-			if (session == null)
-				throw new SyncException("Unknown session for user:" + userId);
-			if (session.userId.equals(userId)) {
+			if (session == null) throw new SyncException("Unknown session for user:" + userId);
+			if (session.userId.equals(userId))
+			{
 				this.byExternalSessionId.remove(session.externalSessionId);
 				return true;
-			} else {
+			}
+			else
+			{
 				return false;
 			}
 		});
@@ -92,7 +101,8 @@ public class SessionMap {
 	 *
 	 * @return count of sessions
 	 */
-	public int size() {
+	public int size()
+	{
 		return this.byToken.size();
 	}
 

@@ -9,19 +9,24 @@ import java.util.function.Supplier;
  * @author ify
  *
  */
-public interface ThreadContextInheritance {
-	public static final Supplier<ThreadContextInheritance> DEFAULT = () -> new ThreadContextInheritance() {
+public interface ThreadContextInheritance
+{
+	public static final Supplier<ThreadContextInheritance> DEFAULT = () -> new ThreadContextInheritance()
+	{
 
 		@Override
-		public void grab() {
+		public void grab()
+		{
 		}
 
 		@Override
-		public void propagate() {
+		public void propagate()
+		{
 		}
 
 		@Override
-		public void clear() {
+		public void clear()
+		{
 		}
 
 	};
