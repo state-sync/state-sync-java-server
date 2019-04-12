@@ -38,6 +38,7 @@ public class Executor
 						catch (final Exception e)
 						{
 							log.log(Level.SEVERE, "HashExecutor", e);
+							e.printStackTrace();
 						}
 					}
 					catch (final InterruptedException e1)
