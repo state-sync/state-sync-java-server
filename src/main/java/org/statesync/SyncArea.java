@@ -163,6 +163,10 @@ public class SyncArea<Model>
 		}
 		final SyncAreaApi<Model> api = new SyncAreaApi<>(session, this);
 		final ObjectNode initialJson = this.storage.load(session.sessionToken);
+		if(initialJson == null)
+		{
+			System.out.println("ERR");
+		}
 		Model model = this.synchronizer.model(initialJson);
 		model = this.reducer.reduce(model, api);
 		model = this.signalHandler.handle(model, api, event.signal, event.parameters);
