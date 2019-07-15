@@ -191,7 +191,7 @@ public class SyncArea<Model>
 				return;
 			}
 			// link
-			log.info("Trace: subscribe: " + session.sessionToken + ", " + session.userId);
+			// log.info("Trace: subscribe: " + session.sessionToken + ", " + session.userId);
 			// load user model
 			final ObjectNode json = this.storage.load(session.sessionToken);
 			final Model model = json == null ? this.synchronizer.newModel() : this.synchronizer.model(json);
