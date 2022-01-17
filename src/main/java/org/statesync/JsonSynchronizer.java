@@ -77,7 +77,8 @@ public class JsonSynchronizer<T>
 		}
 		catch (final Exception e)
 		{
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			return json;
 		}
 	}
 
