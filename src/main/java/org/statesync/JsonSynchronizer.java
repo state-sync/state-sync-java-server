@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.diff.JsonDiff;
 
 public class JsonSynchronizer<T>
@@ -74,6 +75,12 @@ public class JsonSynchronizer<T>
 		try
 		{
 			return (ObjectNode) JsonPatch.fromJson(patch).apply(json);
+		}
+		catch (final JsonPatchException e)
+		{
+			// TODO: Phase 2 or remove completely
+			e.printStackTrace();
+			return json;
 		}
 		catch (final Exception e)
 		{
